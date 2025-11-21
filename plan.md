@@ -232,7 +232,7 @@ The CLI already exposes stub variants for these commands; they currently just lo
       @area(cli) @owner(context-cli-agent) @status(done,commit=b7d7e1c) @scenario(2025-11-21T06:48:23Z-cli-019)
 
 - [ ] cli-020: flesh out `context agent-doc` to generate full agent usage docs
-      @area(cli) @owner(unassigned) @status(unclaimed)
+      @area(cli) @owner(context-cli-agent) @status(in-progress) @scenario(2025-11-21T08:40:00Z-cli-020)
 
 - [ ] cli-021: implement `context project` subcommands (`current`, `set`, `list`) with tests
       @area(cli) @owner(unassigned) @status(unclaimed)
@@ -242,7 +242,7 @@ The CLI already exposes stub variants for these commands; they currently just lo
 ## 6. Upcoming work – Web & Dev Web UI
 
 - [ ] web-010: scaffold React + TS + Vite + shadcn web UI in `web-ui/`
-      @area(web) @owner(context-web-agent) @status(in-progress) @scenario(2025-11-21T06:30:00Z-web-010)
+      @area(web) @owner(context-web-agent) @status(in-progress) @scenario(2025-11-21T08:14:29Z-web-010)
 
 - [ ] web-011: serve compiled `web-ui` assets from `context-web` binary
       @area(web) @owner(unassigned) @status(unclaimed)
@@ -282,8 +282,8 @@ The CLI already exposes stub variants for these commands; they currently just lo
 - [x] infra-012: add cargo build/test caching in CI keyed by lockfile with safe fallbacks
       @area(infra) @owner(context-devops-agent) @status(done,commit=34c240e) @scenario(2025-11-21T07:58:00Z-infra-012)
 
-- [ ] infra-013: run link checker for README/docs in CI and fail on broken links
-      @area(infra) @owner(context-devops-agent) @status(in-progress) @scenario(2025-11-21T08:02:00Z-infra-013)
+- [x] infra-013: run link checker for README/docs in CI and fail on broken links
+      @area(infra) @owner(context-devops-agent) @status(done,commit=ebbfa55) @scenario(2025-11-21T08:02:00Z-infra-013)
 
 - [ ] infra-014: upload test logs/artifacts on CI failure (CLI/core/web) for debugging
       @area(infra) @owner(unassigned) @status(unclaimed)
@@ -312,6 +312,9 @@ The CLI already exposes stub variants for these commands; they currently just lo
 
 - [x] agents-015: tighten Copilot agent docs (allowed/forbidden) and enforce via plan tests
       @area(agents) @owner(context-docs-agent) @status(done,commit=362e0ba) @scenario(2025-11-21T07:35:00Z-agents-015)
+
+- [ ] agents-016: auto-release stale in-progress tasks after 20 minutes via plan-check
+      @area(agents) @owner(context-docs-agent) @status(in-progress) @scenario(2025-11-21T08:50:00Z-agents-016)
 
 - [x] docs-010: write detailed README with install, Quickstart, agents, TDD rules
       @area(docs) @owner(context-docs-agent) @status(done,commit=3674eef) @scenario(2025-11-21T06:10:00Z-docs-010)
