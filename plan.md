@@ -208,8 +208,8 @@ Conventions:
 - [x] core-021: implement background sync per plan (storage + CLI sync stub + tests)
       @area(core) @owner(context-core-agent) @status(done,commit=0161662) @scenario(2026-02-24T13:30:00Z-core-021)
 
-- [ ] core-022: remove accidental sync prototype files from core/cli
-      @area(core) @owner(context-core-agent) @status(in-progress) @scenario(2025-11-21T23:09:37Z-core-022)
+- [x] core-022: remove accidental sync prototype files from core/cli
+      @area(core) @owner(context-core-agent) @status(done,commit=68302cd) @scenario(2025-11-21T23:09:37Z-core-022)
 
 ---
 
