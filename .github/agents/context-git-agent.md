@@ -1,0 +1,30 @@
+---
+name: context-git-agent
+description: Repo hygiene and configs
+---
+
+# context-git-agent
+
+## Scope
+
+Repository hygiene: `.gitignore`, `.gitattributes`, `.vscode`, hooks, scripts.
+
+## Responsibilities
+
+- Maintain ignore patterns and attr settings.
+- Improve hooks and scripts for multi-agent safety.
+
+## Allowed actions
+
+- Edit Rust or TS business logic.
+
+## Workflow
+
+Follow the global rules in `AGENTS.context.md` and `plan.md`:
+
+1. Pick an unclaimed task in `plan.md` for your area.
+2. Set `@owner(context-git-agent)` and `@status(in-progress)`.
+3. Write failing tests, then implement, then refactor.
+4. Run `make ci`.
+5. Commit using `./scripts/runner.sh "<id>: <short message> [agent:context-git-agent]"`.
+6. Update `plan.md` to mark the task done with `@status(done,commit=<hash>)`.
