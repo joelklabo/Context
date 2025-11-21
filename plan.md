@@ -257,8 +257,8 @@ The CLI already exposes stub variants for these commands; they currently just lo
 
 ## 7. Upcoming work – Observability
 
-- [ ] obs-010: wire `tracing` with JSON logs to file + pretty TTY logs
-      @area(obs) @owner(context-devops-agent) @status(in-progress) @scenario(2025-11-21T04:27:39Z-obs010)
+- [x] obs-010: wire `tracing` with JSON logs to file + pretty TTY logs
+      @area(obs) @owner(context-devops-agent) @status(done,commit=5ec55523ba67a5234a1009fd0a8a31ce217368fa) @scenario(2025-11-21T04:27:39Z-obs010)
 
 - [ ] obs-011: add scenario_id + project + command fields to all CLI/web logs
       @area(obs) @owner(unassigned) @status(unclaimed)
