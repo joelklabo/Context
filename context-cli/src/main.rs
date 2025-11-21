@@ -187,8 +187,8 @@ fn run() -> Result<()> {
             handle_get(project, json, key, id, format)?;
         }
         Commands::Cat { key, id } => {
-            tracing::info!(?key, ?id, "Cat command invoked (stub)");
-            eprintln!("TODO: implement `context cat`");
+            tracing::info!(?key, ?id, "Cat command invoked");
+            handle_cat(project, json, key, id)?;
         }
         Commands::Find {
             query,
@@ -290,6 +290,53 @@ fn handle_get(
         }
     }
 
+    Ok(())
+}
+
+fn handle_cat(
+    project: Option<String>,
+    json_output: bool,
+    key: Option<String>,
+    id: Option<String>,
+) -> Result<()> {
+    if key.is_none() && id.is_none() {
+        bail!("Provide --key or --id to retrieve content.");
+    }
+    if key.is_some() && id.is_some() {
+        bail!("Provide only one of --key or --id.");
+    }
+
+    let project = project.unwrap_or_else(|| "default".to_string());
+    let now = Utc::now();
+    let doc_id = id.unwrap_or_else(|| Uuid::new_v4().to_string());
+    let body = match &key {
+        Some(key) => format!("Content for key {key}"),
+        None => format!("Content for document {doc_id}"),
+    };
+
+    let document = Document {
+        id: DocumentId(doc_id),
+        project,
+        key,
+        namespace: None,
+        title: None,
+        tags: Vec::new(),
+        body_markdown: body,
+        created_at: now,
+        updated_at: now,
+        source: SourceType::System,
+        version: 1,
+        ttl_seconds: None,
+        deleted_at: None,
+    };
+
+    if json_output {
+        let serialized = serde_json::to_string_pretty(&document)?;
+        println!("{serialized}");
+        return Ok(());
+    }
+
+    println!("{}", document.body_markdown);
     Ok(())
 }
 
