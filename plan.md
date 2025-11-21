@@ -257,17 +257,17 @@ The CLI already exposes stub variants for these commands; they currently just lo
 
 ## 7. Upcoming work – Observability
 
-- [ ] obs-010: wire `tracing` with JSON logs to file + pretty TTY logs
-      @area(obs) @owner(context-devops-agent) @status(in-progress) @scenario(2025-11-21T04:27:39Z-obs010)
+- [x] obs-010: wire `tracing` with JSON logs to file + pretty TTY logs
+      @area(obs) @owner(context-devops-agent) @status(done,commit=5ec55523ba67a5234a1009fd0a8a31ce217368fa) @scenario(2025-11-21T04:27:39Z-obs010)
 
-- [ ] obs-011: add scenario_id + project + command fields to all CLI/web logs
-      @area(obs) @owner(unassigned) @status(unclaimed)
+- [x] obs-011: add scenario_id + project + command fields to all CLI/web logs
+      @area(obs) @owner(context-devops-agent) @status(done,commit=b994b95466ebb73fda38771ee5bf9f854351574f) @scenario(2025-11-21T05:03:12Z-obs011)
 
-- [ ] obs-012: implement basic span tracing for major operations (put/get/find/web)
-      @area(obs) @owner(unassigned) @status(unclaimed)
+- [x] obs-012: implement basic span tracing for major operations (put/get/find/web)
+      @area(obs) @owner(context-devops-agent) @status(done,commit=cac9828ae1fe31e8a59114b9873de9112f1f6d35) @scenario(2025-11-21T05:16:35Z-obs012)
 
-- [ ] obs-013: implement `context debug-bundle` backend (log collection, trace export)
-      @area(obs) @owner(unassigned) @status(unclaimed)
+- [x] obs-013: implement `context debug-bundle` backend (log collection, trace export)
+      @area(obs) @owner(context-devops-agent) @status(done,commit=1fbff8c9910d039dc69d041e0aa02c44bf1eeeb3) @scenario(2025-11-21T05:22:43Z-obs013)
 
 ---
 

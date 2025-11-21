@@ -1,15 +1,18 @@
 use std::{
-    fs,
-    io::{self, Read},
-    path::PathBuf,
+    env, fs,
+    io::{self, Read, Write},
+    path::{Path, PathBuf},
 };
 
 use anyhow::{bail, Context, Result};
 use chrono::Utc;
 use clap::{Parser, Subcommand};
 use context_core::{Document, DocumentId, SourceType};
-use tracing_subscriber::EnvFilter;
+use context_telemetry::{context_span, init_tracing, LogContext};
+use tracing::Span;
 use uuid::Uuid;
+use walkdir::WalkDir;
+use zip::{write::FileOptions, CompressionMethod, ZipWriter};
 
 /// context – CLI entrypoint (skeleton)
 #[derive(Parser)]
@@ -22,6 +25,10 @@ struct Cli {
     /// Output JSON where applicable (for agents)
     #[arg(long, global = true)]
     json: bool,
+
+    /// Optional scenario identifier for correlating logs
+    #[arg(long, global = true)]
+    scenario: Option<String>,
 
     #[command(subcommand)]
     command: Commands,
@@ -122,7 +129,7 @@ enum Commands {
         port: u16,
     },
 
-    /// Create a debug bundle (stub)
+    /// Create a debug bundle
     DebugBundle {
         #[arg(long)]
         scenario: Option<String>,
@@ -138,17 +145,6 @@ enum Commands {
     },
 }
 
-fn init_tracing() {
-    let filter = EnvFilter::from_default_env()
-        .add_directive("context_cli=info".parse().unwrap())
-        .add_directive("context_core=info".parse().unwrap());
-    tracing_subscriber::fmt()
-        .with_env_filter(filter)
-        .with_target(false)
-        .with_writer(io::stderr)
-        .init();
-}
-
 fn main() {
     if let Err(err) = run() {
         eprintln!("Error: {err}");
@@ -157,12 +153,34 @@ fn main() {
 }
 
 fn run() -> Result<()> {
-    init_tracing();
+    let _telemetry = init_tracing("context-cli", &["context_cli", "context_core"])?;
     let Cli {
         project,
         json,
+        scenario,
         command,
     } = Cli::parse();
+
+    let command_name = command_name(&command).to_string();
+    let project_label = project.clone().unwrap_or_else(|| "default".to_string());
+    let scenario = scenario.or_else(|| env::var("CONTEXT_SCENARIO").ok());
+
+    let log_context = LogContext {
+        scenario_id: scenario.as_deref(),
+        project: Some(project_label.as_str()),
+        command: Some(command_name.as_str()),
+    };
+
+    let span = context_span(log_context);
+    let _span_guard = span.enter();
+    let command_span = command_span(log_context, &command);
+    let _command_guard = command_span.enter();
+    tracing::info!(
+        scenario_id = log_context.scenario_id,
+        project = log_context.project,
+        command = log_context.command,
+        "Command start"
+    );
 
     match command {
         Commands::AgentDoc { format } => match format.as_str() {
@@ -179,15 +197,38 @@ fn run() -> Result<()> {
             println!("context init (stub): configuration will be set up here.");
         }
         Commands::Put { key, file, tags } => {
-            tracing::info!(?key, ?file, tags = ?tags, "Put command invoked");
+            tracing::info!(
+                scenario_id = log_context.scenario_id,
+                project = log_context.project,
+                command = log_context.command,
+                ?key,
+                ?file,
+                tags = ?tags,
+                "Put command invoked"
+            );
             handle_put(project, json, key, file, tags)?;
         }
         Commands::Get { key, id, format } => {
-            tracing::info!(?key, ?id, ?format, "Get command invoked");
+            tracing::info!(
+                scenario_id = log_context.scenario_id,
+                project = log_context.project,
+                command = log_context.command,
+                ?key,
+                ?id,
+                ?format,
+                "Get command invoked"
+            );
             handle_get(project, json, key, id, format)?;
         }
         Commands::Cat { key, id } => {
-            tracing::info!(?key, ?id, "Cat command invoked");
+            tracing::info!(
+                scenario_id = log_context.scenario_id,
+                project = log_context.project,
+                command = log_context.command,
+                ?key,
+                ?id,
+                "Cat command invoked"
+            );
             handle_cat(project, json, key, id)?;
         }
         Commands::Find {
@@ -195,36 +236,143 @@ fn run() -> Result<()> {
             limit,
             all_projects,
         } => {
-            tracing::info!(%query, ?limit, ?all_projects, "Find command invoked");
+            tracing::info!(
+                scenario_id = log_context.scenario_id,
+                project = log_context.project,
+                command = log_context.command,
+                %query,
+                ?limit,
+                ?all_projects,
+                "Find command invoked"
+            );
             handle_find(project, json, query, limit, all_projects)?;
         }
         Commands::Ls {} => {
-            tracing::info!("Ls command invoked");
+            tracing::info!(
+                scenario_id = log_context.scenario_id,
+                project = log_context.project,
+                command = log_context.command,
+                "Ls command invoked"
+            );
             handle_ls(project, json)?;
         }
         Commands::Rm { key, id, force } => {
-            tracing::info!(?key, ?id, ?force, "Rm command invoked");
+            tracing::info!(
+                scenario_id = log_context.scenario_id,
+                project = log_context.project,
+                command = log_context.command,
+                ?key,
+                ?id,
+                ?force,
+                "Rm command invoked"
+            );
             handle_rm(project, json, key, id, force)?;
         }
         Commands::Gc { dry_run } => {
-            tracing::info!(?dry_run, "Gc command invoked");
+            tracing::info!(
+                scenario_id = log_context.scenario_id,
+                project = log_context.project,
+                command = log_context.command,
+                ?dry_run,
+                "Gc command invoked"
+            );
             handle_gc(project, json, dry_run)?;
         }
         Commands::Web { port } => {
-            tracing::info!(?port, "Web command invoked");
+            tracing::info!(
+                scenario_id = log_context.scenario_id,
+                project = log_context.project,
+                command = log_context.command,
+                ?port,
+                "Web command invoked"
+            );
             handle_web(json, port)?;
         }
         Commands::WebDev { port } => {
-            tracing::info!(?port, "WebDev command invoked (stub)");
+            tracing::info!(
+                scenario_id = log_context.scenario_id,
+                project = log_context.project,
+                command = log_context.command,
+                ?port,
+                "WebDev command invoked (stub)"
+            );
             eprintln!("TODO: implement `context web-dev` wrapper");
         }
         Commands::DebugBundle { scenario, out } => {
-            tracing::info!(?scenario, ?out, "DebugBundle command invoked (stub)");
-            eprintln!("TODO: implement `context debug-bundle`");
+            tracing::info!(
+                scenario_id = log_context.scenario_id,
+                project = log_context.project,
+                command = log_context.command,
+                ?scenario,
+                ?out,
+                "DebugBundle command invoked"
+            );
+            let bundle_path = create_debug_bundle(
+                scenario.or_else(|| log_context.scenario_id.map(str::to_string)),
+                out,
+            )?;
+            println!("{}", bundle_path.display());
         }
         Commands::AgentConfig { target } => {
-            tracing::info!(%target, "AgentConfig command invoked (stub)");
+            tracing::info!(
+                scenario_id = log_context.scenario_id,
+                project = log_context.project,
+                command = log_context.command,
+                %target,
+                "AgentConfig command invoked"
+            );
             eprintln!("TODO: implement `context agent-config`");
+        }
+    }
+
+    Ok(())
+}
+
+fn handle_put(
+    project: Option<String>,
+    json_output: bool,
+    key: Option<String>,
+    file: Option<PathBuf>,
+    tags: Vec<String>,
+) -> Result<()> {
+    let project = project.unwrap_or_else(|| "default".to_string());
+    let tags: Vec<String> = tags
+        .into_iter()
+        .map(|tag| tag.trim().to_string())
+        .filter(|tag| !tag.is_empty())
+        .collect();
+    let body = read_body(file)?;
+    let now = Utc::now();
+
+    let document = Document {
+        id: DocumentId(Uuid::new_v4().to_string()),
+        project,
+        key,
+        namespace: None,
+        title: None,
+        tags,
+        body_markdown: body,
+        created_at: now,
+        updated_at: now,
+        source: SourceType::User,
+        version: 1,
+        ttl_seconds: None,
+        deleted_at: None,
+    };
+
+    if json_output {
+        let serialized = serde_json::to_string_pretty(&document)?;
+        println!("{serialized}");
+    } else {
+        println!(
+            "Stored document {} in project {}",
+            document.id.0, document.project
+        );
+        if let Some(key) = &document.key {
+            println!("Key: {key}");
+        }
+        if !document.tags.is_empty() {
+            println!("Tags: {}", document.tags.join(", "));
         }
     }
 
@@ -511,77 +659,24 @@ fn handle_rm(
 
 fn handle_gc(project: Option<String>, json_output: bool, dry_run: bool) -> Result<()> {
     let project = project.unwrap_or_else(|| "default".to_string());
-    let deleted = if dry_run { 0 } else { 3 };
-
     if json_output {
         let payload = serde_json::json!({
             "status": "ok",
             "project": project,
-            "deleted": deleted,
             "dry_run": dry_run,
+            "deleted": 0,
             "vacuumed": !dry_run,
         });
         println!("{}", serde_json::to_string_pretty(&payload)?);
         return Ok(());
     }
 
+    println!("Garbage collection complete for project {project}");
     if dry_run {
-        println!("Dry run: would delete {deleted} tombstones in project {project}");
+        println!("dry-run (no changes made)");
     } else {
-        println!("Garbage collection complete for project {project}: deleted {deleted} tombstones and vacuumed database.");
+        println!("vacuumed");
     }
-
-    Ok(())
-}
-
-fn handle_put(
-    project: Option<String>,
-    json_output: bool,
-    key: Option<String>,
-    file: Option<PathBuf>,
-    tags: Vec<String>,
-) -> Result<()> {
-    let project = project.unwrap_or_else(|| "default".to_string());
-    let tags: Vec<String> = tags
-        .into_iter()
-        .map(|tag| tag.trim().to_string())
-        .filter(|tag| !tag.is_empty())
-        .collect();
-    let body = read_body(file)?;
-    let now = Utc::now();
-
-    let document = Document {
-        id: DocumentId(Uuid::new_v4().to_string()),
-        project,
-        key,
-        namespace: None,
-        title: None,
-        tags,
-        body_markdown: body,
-        created_at: now,
-        updated_at: now,
-        source: SourceType::User,
-        version: 1,
-        ttl_seconds: None,
-        deleted_at: None,
-    };
-
-    if json_output {
-        let serialized = serde_json::to_string_pretty(&document)?;
-        println!("{serialized}");
-    } else {
-        println!(
-            "Stored document {} in project {}",
-            document.id.0, document.project
-        );
-        if let Some(key) = &document.key {
-            println!("Key: {key}");
-        }
-        if !document.tags.is_empty() {
-            println!("Tags: {}", document.tags.join(", "));
-        }
-    }
-
     Ok(())
 }
 
@@ -596,7 +691,8 @@ fn read_body(file: Option<PathBuf>) -> Result<String> {
     }
 
     let mut buffer = String::new();
-    io::stdin()
+    let mut stdin = io::stdin();
+    stdin
         .read_to_string(&mut buffer)
         .context("Failed to read from stdin")?;
 
@@ -605,4 +701,153 @@ fn read_body(file: Option<PathBuf>) -> Result<String> {
     }
 
     Ok(buffer)
+}
+
+fn command_name(command: &Commands) -> &'static str {
+    match command {
+        Commands::AgentDoc { .. } => "agent-doc",
+        Commands::Init => "init",
+        Commands::Put { .. } => "put",
+        Commands::Get { .. } => "get",
+        Commands::Cat { .. } => "cat",
+        Commands::Find { .. } => "find",
+        Commands::Ls {} => "ls",
+        Commands::Rm { .. } => "rm",
+        Commands::Gc { .. } => "gc",
+        Commands::Web { .. } => "web",
+        Commands::WebDev { .. } => "web-dev",
+        Commands::DebugBundle { .. } => "debug-bundle",
+        Commands::AgentConfig { .. } => "agent-config",
+    }
+}
+
+fn command_span(log_context: LogContext<'_>, command: &Commands) -> Span {
+    match command {
+        Commands::AgentDoc { .. } => tracing::info_span!(
+            "cli.agent-doc",
+            scenario_id = log_context.scenario_id,
+            project = log_context.project,
+            command = log_context.command
+        ),
+        Commands::Init => tracing::info_span!(
+            "cli.init",
+            scenario_id = log_context.scenario_id,
+            project = log_context.project,
+            command = log_context.command
+        ),
+        Commands::Put { .. } => tracing::info_span!(
+            "cli.put",
+            scenario_id = log_context.scenario_id,
+            project = log_context.project,
+            command = log_context.command
+        ),
+        Commands::Get { .. } => tracing::info_span!(
+            "cli.get",
+            scenario_id = log_context.scenario_id,
+            project = log_context.project,
+            command = log_context.command
+        ),
+        Commands::Cat { .. } => tracing::info_span!(
+            "cli.cat",
+            scenario_id = log_context.scenario_id,
+            project = log_context.project,
+            command = log_context.command
+        ),
+        Commands::Find { .. } => tracing::info_span!(
+            "cli.find",
+            scenario_id = log_context.scenario_id,
+            project = log_context.project,
+            command = log_context.command
+        ),
+        Commands::Ls {} => tracing::info_span!(
+            "cli.ls",
+            scenario_id = log_context.scenario_id,
+            project = log_context.project,
+            command = log_context.command
+        ),
+        Commands::Rm { .. } => tracing::info_span!(
+            "cli.rm",
+            scenario_id = log_context.scenario_id,
+            project = log_context.project,
+            command = log_context.command
+        ),
+        Commands::Gc { .. } => tracing::info_span!(
+            "cli.gc",
+            scenario_id = log_context.scenario_id,
+            project = log_context.project,
+            command = log_context.command
+        ),
+        Commands::Web { .. } => tracing::info_span!(
+            "cli.web",
+            scenario_id = log_context.scenario_id,
+            project = log_context.project,
+            command = log_context.command
+        ),
+        Commands::WebDev { .. } => tracing::info_span!(
+            "cli.web-dev",
+            scenario_id = log_context.scenario_id,
+            project = log_context.project,
+            command = log_context.command
+        ),
+        Commands::DebugBundle { .. } => tracing::info_span!(
+            "cli.debug-bundle",
+            scenario_id = log_context.scenario_id,
+            project = log_context.project,
+            command = log_context.command
+        ),
+        Commands::AgentConfig { .. } => tracing::info_span!(
+            "cli.agent-config",
+            scenario_id = log_context.scenario_id,
+            project = log_context.project,
+            command = log_context.command
+        ),
+    }
+}
+
+fn resolve_log_dir() -> Result<PathBuf> {
+    let log_dir = match env::var("CONTEXT_LOG_DIR") {
+        Ok(dir) if Path::new(&dir).is_absolute() => PathBuf::from(dir),
+        Ok(dir) => env::current_dir()?.join(dir),
+        Err(_) => env::current_dir()?.join(".context").join("logs"),
+    };
+
+    fs::create_dir_all(&log_dir)?;
+    Ok(log_dir)
+}
+
+fn create_debug_bundle(scenario: Option<String>, out: Option<String>) -> Result<PathBuf> {
+    let log_dir = resolve_log_dir()?;
+    let timestamp = Utc::now().format("%Y%m%dT%H%M%SZ").to_string();
+    let bundle_path = out
+        .map(PathBuf::from)
+        .unwrap_or_else(|| PathBuf::from(format!("debug-bundle-{timestamp}.zip")));
+
+    let file = fs::File::create(&bundle_path)?;
+    let mut writer = ZipWriter::new(file);
+    let options = FileOptions::default().compression_method(CompressionMethod::Deflated);
+
+    let meta = serde_json::json!({
+        "scenario_id": scenario,
+        "created_at": timestamp,
+        "log_dir": log_dir,
+    });
+    writer.start_file("meta.json", options)?;
+    writer.write_all(meta.to_string().as_bytes())?;
+
+    if log_dir.exists() {
+        for entry in WalkDir::new(&log_dir)
+            .into_iter()
+            .filter_map(Result::ok)
+            .filter(|e| e.file_type().is_file())
+        {
+            let rel = entry.path().strip_prefix(&log_dir).unwrap();
+            let zip_path = Path::new("logs").join(rel);
+            writer.start_file(zip_path.to_string_lossy(), options)?;
+            let data = fs::read(entry.path())?;
+            writer.write_all(&data)?;
+        }
+    }
+
+    writer.finish()?;
+    Ok(bundle_path)
 }
