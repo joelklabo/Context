@@ -69,7 +69,7 @@ When **complete** (after CI + commit):
 
 ```md
 - [x] cli-002: implement `context put` command (stub + tests + impl)
-      @area(cli) @owner(context-cli-agent) @status(done,commit=abc1234) @scenario(2025-11-21T04:10:00Z-xyz)
+      @area(cli) @owner(context-cli-agent) @status(done,commit=<bootstrap>) @scenario(2025-11-21T04:10:00Z-xyz)
 ```
 
 Conventions:

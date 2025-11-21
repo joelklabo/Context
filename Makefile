@@ -21,6 +21,7 @@ lint:
 	$(CARGO) clippy --all-targets --all-features -- -D warnings || true
 
 ci:
+	$(CARGO) fetch --locked
 	$(MAKE) lint
 	$(MAKE) test
 	$(MAKE) plan-check

@@ -140,18 +140,16 @@ fn main() -> Result<()> {
     let cli = Cli::parse();
 
     match cli.command {
-        Commands::AgentDoc { format } => {
-            match format.as_str() {
-                "markdown" | "md" => {
-                    let md = context_agent::agent_doc_markdown();
-                    print!("{md}");
-                }
-                other => {
-                    eprintln!("Unsupported format: {other}. Try --format markdown");
-                    std::process::exit(2);
-                }
+        Commands::AgentDoc { format } => match format.as_str() {
+            "markdown" | "md" => {
+                let md = context_agent::agent_doc_markdown();
+                print!("{md}");
             }
-        }
+            other => {
+                eprintln!("Unsupported format: {other}. Try --format markdown");
+                std::process::exit(2);
+            }
+        },
         Commands::Init => {
             println!("context init (stub): configuration will be set up here.");
         }
@@ -167,7 +165,11 @@ fn main() -> Result<()> {
             tracing::info!(?key, ?id, "Cat command invoked (stub)");
             eprintln!("TODO: implement `context cat`");
         }
-        Commands::Find { query, limit, all_projects } => {
+        Commands::Find {
+            query,
+            limit,
+            all_projects,
+        } => {
             tracing::info!(%query, ?limit, ?all_projects, "Find command invoked (stub)");
             eprintln!("TODO: implement `context find`");
         }

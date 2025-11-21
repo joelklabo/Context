@@ -7,7 +7,7 @@ struct Task {
     id: String,
     owner: Option<String>,
 
-status: Option<String>,
+    status: Option<String>,
     raw_status: Option<String>,
 }
 
@@ -19,11 +19,10 @@ fn main() {
 }
 
 fn run() -> Result<(), String> {
-    let contents = fs::read_to_string("plan.md")
-        .map_err(|e| format!("failed to read plan.md: {e}"))?;
+    let contents =
+        fs::read_to_string("plan.md").map_err(|e| format!("failed to read plan.md: {e}"))?;
 
-    let task_re = Regex::new(r"^- \[( |x)\]\s+([a-z0-9-]+):")
-        .map_err(|e| e.to_string())?;
+    let task_re = Regex::new(r"^- \[( |x)\]\s+([a-z0-9-]+):").map_err(|e| e.to_string())?;
     let owner_re = Regex::new(r"@owner\(([^)]+)\)").map_err(|e| e.to_string())?;
     let status_re = Regex::new(r"@status\(([^)]+)\)").map_err(|e| e.to_string())?;
 
@@ -40,7 +39,10 @@ fn run() -> Result<(), String> {
                 raw_status: None,
             });
             current_index = Some(tasks.len() - 1);
-        } else if line.trim_start().starts_with("@") || line.contains("@owner(") || line.contains("@status(") {
+        } else if line.trim_start().starts_with("@")
+            || line.contains("@owner(")
+            || line.contains("@status(")
+        {
             if let Some(idx) = current_index {
                 let t = &mut tasks[idx];
                 if let Some(caps) = owner_re.captures(line) {
@@ -72,7 +74,10 @@ fn run() -> Result<(), String> {
 
         if let (Some(owner), Some(status)) = (&t.owner, &t.status) {
             if status == "in-progress" && owner == "unassigned" {
-                errors.push(format!("task {} is in-progress but @owner(unassigned)", t.id));
+                errors.push(format!(
+                    "task {} is in-progress but @owner(unassigned)",
+                    t.id
+                ));
             }
             if status == "unclaimed" && owner != "unassigned" {
                 errors.push(format!("task {} is unclaimed but owner is {}", t.id, owner));
@@ -85,20 +90,24 @@ fn run() -> Result<(), String> {
                 // expect "done,commit=<hash>"
                 let has_commit = raw.contains("commit=");
                 if !has_commit {
-                    errors.push(format!("task {} @status(done,...) must include commit=<hash>", t.id));
-                } else {
-                    if let Some(commit_idx) = raw.find("commit=") {
-                        let after = &raw[commit_idx + "commit=".len()..];
-                        let hash = after.split(|c| c == ')' || c == ',').next().unwrap().trim();
-                        if !hash.is_empty() && hash != "<bootstrap>" {
-                            let ok = Command::new("git")
-                                .args(["rev-parse", "--verify", hash])
-                                .output()
-                                .map(|o| o.status.success())
-                                .unwrap_or(true);
-                            if !ok {
-                                errors.push(format!("task {} refers to unknown commit hash {}", t.id, hash));
-                            }
+                    errors.push(format!(
+                        "task {} @status(done,...) must include commit=<hash>",
+                        t.id
+                    ));
+                } else if let Some(commit_idx) = raw.find("commit=") {
+                    let after = &raw[commit_idx + "commit=".len()..];
+                    let hash = after.split([')', ',']).next().unwrap().trim();
+                    if !hash.is_empty() && hash != "<bootstrap>" {
+                        let ok = Command::new("git")
+                            .args(["rev-parse", "--verify", hash])
+                            .output()
+                            .map(|o| o.status.success())
+                            .unwrap_or(true);
+                        if !ok {
+                            errors.push(format!(
+                                "task {} refers to unknown commit hash {}",
+                                t.id, hash
+                            ));
                         }
                     }
                 }

@@ -1,7 +1,7 @@
 use axum::{routing::get, Router};
 use std::net::SocketAddr;
-use tracing_subscriber::EnvFilter;
 use tokio::net::TcpListener;
+use tracing_subscriber::EnvFilter;
 
 async fn health() -> &'static str {
     "OK"
@@ -13,8 +13,7 @@ async fn agent_doc() -> String {
 
 #[tokio::main]
 async fn main() {
-    let filter = EnvFilter::from_default_env()
-        .add_directive("context_web=info".parse().unwrap());
+    let filter = EnvFilter::from_default_env().add_directive("context_web=info".parse().unwrap());
     tracing_subscriber::fmt()
         .with_env_filter(filter)
         .with_target(false)
