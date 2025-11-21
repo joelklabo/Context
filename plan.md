@@ -155,8 +155,8 @@ Conventions:
 - [x] boot-006: add `.githooks/pre-commit` that runs `make ci`
       @area(infra) @owner(bootstrap) @status(done,commit=<bootstrap>)
 
-- [ ] infra-010: ensure CI fetches full git history so plan-check can validate commit hashes
-      @area(infra) @owner(context-devops-agent) @status(in-progress) @scenario(2025-11-21T07:05:00Z-infra-010)
+- [x] infra-010: ensure CI fetches full git history so plan-check can validate commit hashes
+      @area(infra) @owner(context-devops-agent) @status(done,commit=ce6f73f) @scenario(2025-11-21T07:05:00Z-infra-010)
 
 - [x] plan-001: create PLAN.md with agent/TDD rules and initial tasks
       @area(docs) @owner(bootstrap) @status(done,commit=<bootstrap>)
