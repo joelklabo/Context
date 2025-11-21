@@ -1,11 +1,14 @@
 use anyhow::Result;
 use assert_cmd::Command;
 use context_core::Document;
+use tempfile::tempdir;
 
 #[test]
 fn get_returns_json_by_key() -> Result<()> {
+    let temp = tempdir()?;
     let mut cmd = Command::new(assert_cmd::cargo::cargo_bin!("context-cli"));
     let assert = cmd
+        .env("CONTEXT_HOME", temp.path())
         .args([
             "--project",
             "demo-project",
@@ -30,8 +33,13 @@ fn get_returns_json_by_key() -> Result<()> {
 
 #[test]
 fn get_prints_markdown_when_not_json() -> Result<()> {
+    let temp = tempdir()?;
     let mut cmd = Command::new(assert_cmd::cargo::cargo_bin!("context-cli"));
-    let assert = cmd.args(["get", "--id", "doc-123"]).assert().success();
+    let assert = cmd
+        .env("CONTEXT_HOME", temp.path())
+        .args(["get", "--id", "doc-123"])
+        .assert()
+        .success();
 
     let stdout = String::from_utf8_lossy(&assert.get_output().stdout);
     assert!(stdout.contains("Project: default"));
@@ -43,8 +51,13 @@ fn get_prints_markdown_when_not_json() -> Result<()> {
 
 #[test]
 fn get_requires_key_or_id() -> Result<()> {
+    let temp = tempdir()?;
     let mut cmd = Command::new(assert_cmd::cargo::cargo_bin!("context-cli"));
-    let assert = cmd.arg("get").assert().failure();
+    let assert = cmd
+        .env("CONTEXT_HOME", temp.path())
+        .arg("get")
+        .assert()
+        .failure();
 
     let output = assert.get_output();
     assert_eq!(output.status.code(), Some(1));

@@ -45,7 +45,7 @@ pub struct SearchHit {
     pub score: f32,
 }
 
-pub type Result<T> = std::result::Result<T, Box<dyn std::error::Error + Send + Sync>>;
+pub type Result<T> = anyhow::Result<T>;
 
 #[async_trait::async_trait]
 pub trait Storage: Send + Sync {
@@ -55,3 +55,4 @@ pub trait Storage: Send + Sync {
 }
 
 pub mod sqlite;
+pub mod sync;

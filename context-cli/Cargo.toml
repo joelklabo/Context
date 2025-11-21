@@ -16,6 +16,7 @@ serde = { version = "1", features = ["derive"] }
 context-core = { path = "../context-core" }
 context-agent = { path = "../context-agent" }
 context-telemetry = { path = "../context-telemetry" }
+dirs = "5"
 
 [dev-dependencies]
 assert_cmd = "2"

@@ -1,5 +1,6 @@
 use std::cmp::Ordering;
 
+use anyhow::bail;
 use chrono::{DateTime, Utc};
 use sqlx::{migrate::Migrator, sqlite::SqliteRow, Row, SqlitePool};
 
@@ -44,9 +45,7 @@ impl SqliteStorage {
             "User" => SourceType::User,
             "Import" => SourceType::Import,
             "System" => SourceType::System,
-            other => {
-                return Err(format!("unknown source type: {other}").into());
-            }
+            other => bail!("unknown source type: {other}"),
         };
 
         Ok(Document {

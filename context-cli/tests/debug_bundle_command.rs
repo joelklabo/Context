@@ -19,6 +19,7 @@ fn debug_bundle_outputs_json_when_requested() -> Result<()> {
     let out_path = temp.path().join("bundle.zip");
     let mut cmd = Command::new(assert_cmd::cargo::cargo_bin!("context-cli"));
     let assert = cmd
+        .env("CONTEXT_HOME", temp.path())
         .env("CONTEXT_LOG_DIR", &log_dir)
         .args([
             "--json",

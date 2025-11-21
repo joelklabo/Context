@@ -1,9 +1,9 @@
 use std::fs;
 use std::path::PathBuf;
 
-use anyhow::Result;
 use chrono::Utc;
-use context_core::sync::{load_meta, pull, push, status, write_meta, SyncConfig, SyncMeta, SyncState};
+use context_core::sync::{load_meta, pull, push, status, write_meta, SyncConfig, SyncState};
+use context_core::Result;
 use tempfile::tempdir;
 
 fn write_file(path: &PathBuf, contents: &[u8]) {

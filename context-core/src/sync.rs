@@ -2,6 +2,7 @@ use std::fs::{self, File};
 use std::io::{Read, Write};
 use std::path::{Path, PathBuf};
 
+use anyhow::{anyhow, bail};
 use chrono::{DateTime, Utc};
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
@@ -26,7 +27,8 @@ pub struct SyncMeta {
     pub project: Option<String>,
 }
 
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
+#[serde(rename_all = "camelCase")]
 pub enum SyncState {
     InSync,
     Ahead,
@@ -35,14 +37,14 @@ pub enum SyncState {
     Unknown,
 }
 
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
 pub struct SyncStatus {
     pub state: SyncState,
     pub local: Option<SyncMeta>,
     pub remote: Option<SyncMeta>,
 }
 
-#[derive(Clone, Debug, PartialEq, Eq)]
+#[derive(Clone, Debug, Serialize, Deserialize, PartialEq, Eq)]
 pub struct SyncResult {
     pub generation: u64,
     pub db_hash: String,
@@ -79,7 +81,7 @@ pub fn push(cfg: &SyncConfig, force: bool) -> Result<SyncResult> {
     let _lock = acquire_lock(&cfg.local_db)?;
 
     if !cfg.local_db.exists() {
-        return Err("local database not found".into());
+        bail!("local database not found");
     }
 
     fs::create_dir_all(&cfg.remote)?;
@@ -91,13 +93,13 @@ pub fn push(cfg: &SyncConfig, force: bool) -> Result<SyncResult> {
 
     if !force {
         if let (Some(local), Some(remote)) = (&local_meta, &current_remote_meta) {
-            if local.generation != remote.generation && local.db_hash != remote.db_hash {
-                return Err("remote diverged; use --force to overwrite".into());
+            if local.db_hash != remote.db_hash {
+                bail!("remote diverged; use --force to overwrite");
             }
         }
     }
 
-    let bak = cfg.local_db.with_extension("bak");
+    let bak = cfg.local_db.with_file_name("db.sqlite.bak");
     fs::copy(&cfg.local_db, &bak)?;
 
     let meta = build_meta(&cfg.local_db, &local_meta)?;
@@ -119,17 +121,17 @@ pub fn pull(cfg: &SyncConfig, force: bool) -> Result<SyncResult> {
     let remote_meta_path = cfg.remote.join("sync-meta.json");
 
     if !remote_db.exists() {
-        return Err("remote database not found".into());
+        bail!("remote database not found");
     }
 
-    let remote_meta = load_meta(&remote_meta_path)?
-        .ok_or_else(|| "remote metadata missing".to_string())?;
+    let remote_meta =
+        load_meta(&remote_meta_path)?.ok_or_else(|| anyhow!("remote metadata missing"))?;
     let local_meta = load_meta(&cfg.local_meta)?;
 
     if !force {
         if let Some(local) = &local_meta {
-            if local.generation != remote_meta.generation && local.db_hash != remote_meta.db_hash {
-                return Err("local and remote have diverged; rerun with --force".into());
+            if local.db_hash != remote_meta.db_hash {
+                bail!("local and remote have diverged; rerun with --force");
             }
         }
     }
@@ -216,7 +218,7 @@ impl Drop for LockGuard {
 fn acquire_lock(local_db: &Path) -> Result<LockGuard> {
     let dir = local_db
         .parent()
-        .ok_or_else(|| "local db path missing parent".to_string())?;
+        .ok_or_else(|| anyhow!("local db path missing parent"))?;
     let lock_path = dir.join("sync.lock");
     let file = File::options()
         .write(true)
@@ -228,7 +230,7 @@ fn acquire_lock(local_db: &Path) -> Result<LockGuard> {
             let _ = writeln!(f, "{pid}");
             Ok(LockGuard { path: lock_path })
         }
-        Err(e) => Err(format!("could not obtain sync lock: {e}").into()),
+        Err(e) => Err(anyhow!("could not obtain sync lock: {e}")),
     }
 }
 

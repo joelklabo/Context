@@ -1,10 +1,13 @@
 use anyhow::Result;
 use assert_cmd::Command;
+use tempfile::tempdir;
 
 #[test]
 fn agent_doc_emits_detailed_markdown() -> Result<()> {
+    let temp = tempdir()?;
     let mut cmd = Command::new(assert_cmd::cargo::cargo_bin!("context-cli"));
     let assert = cmd
+        .env("CONTEXT_HOME", temp.path())
         .args(["agent-doc", "--format", "markdown"])
         .assert()
         .success();

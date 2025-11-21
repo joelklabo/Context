@@ -1,11 +1,17 @@
 use anyhow::Result;
 use assert_cmd::Command;
 use serde_json::Value;
+use tempfile::tempdir;
 
 #[test]
 fn rm_requires_key_or_id() -> Result<()> {
+    let temp = tempdir()?;
     let mut cmd = Command::new(assert_cmd::cargo::cargo_bin!("context-cli"));
-    let assert = cmd.arg("rm").assert().failure();
+    let assert = cmd
+        .env("CONTEXT_HOME", temp.path())
+        .arg("rm")
+        .assert()
+        .failure();
 
     let output = assert.get_output();
     assert_eq!(output.status.code(), Some(1));
@@ -17,8 +23,10 @@ fn rm_requires_key_or_id() -> Result<()> {
 
 #[test]
 fn rm_accepts_key_and_outputs_json() -> Result<()> {
+    let temp = tempdir()?;
     let mut cmd = Command::new(assert_cmd::cargo::cargo_bin!("context-cli"));
     let assert = cmd
+        .env("CONTEXT_HOME", temp.path())
         .args([
             "--project",
             "demo-project",
@@ -43,8 +51,13 @@ fn rm_accepts_key_and_outputs_json() -> Result<()> {
 
 #[test]
 fn gc_respects_dry_run_and_outputs_json() -> Result<()> {
+    let temp = tempdir()?;
     let mut cmd = Command::new(assert_cmd::cargo::cargo_bin!("context-cli"));
-    let assert = cmd.args(["--json", "gc", "--dry-run"]).assert().success();
+    let assert = cmd
+        .env("CONTEXT_HOME", temp.path())
+        .args(["--json", "gc", "--dry-run"])
+        .assert()
+        .success();
 
     let stdout = assert.get_output().stdout.clone();
     let value: Value = serde_json::from_slice(&stdout)?;
@@ -59,8 +72,13 @@ fn gc_respects_dry_run_and_outputs_json() -> Result<()> {
 
 #[test]
 fn gc_human_output_when_not_json() -> Result<()> {
+    let temp = tempdir()?;
     let mut cmd = Command::new(assert_cmd::cargo::cargo_bin!("context-cli"));
-    let assert = cmd.arg("gc").assert().success();
+    let assert = cmd
+        .env("CONTEXT_HOME", temp.path())
+        .arg("gc")
+        .assert()
+        .success();
 
     let stdout = String::from_utf8_lossy(&assert.get_output().stdout);
     assert!(stdout.contains("Garbage collection complete"));

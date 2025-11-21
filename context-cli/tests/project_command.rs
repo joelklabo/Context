@@ -6,8 +6,10 @@ use tempfile::tempdir;
 #[test]
 fn current_defaults_to_default_project() -> Result<()> {
     let temp = tempdir()?;
+    let home = temp.path().join("home");
     let mut cmd = Command::new(assert_cmd::cargo::cargo_bin!("context-cli"));
     let assert = cmd
+        .env("CONTEXT_HOME", &home)
         .current_dir(temp.path())
         .args(["--json", "project", "current"])
         .assert()
@@ -23,9 +25,11 @@ fn current_defaults_to_default_project() -> Result<()> {
 #[test]
 fn set_updates_current_and_is_used_by_other_commands() -> Result<()> {
     let temp = tempdir()?;
+    let home = temp.path().join("home");
 
     let mut set_cmd = Command::new(assert_cmd::cargo::cargo_bin!("context-cli"));
     set_cmd
+        .env("CONTEXT_HOME", &home)
         .current_dir(temp.path())
         .args(["--json", "project", "set", "demo-project"])
         .assert()
@@ -33,6 +37,7 @@ fn set_updates_current_and_is_used_by_other_commands() -> Result<()> {
 
     let mut current_cmd = Command::new(assert_cmd::cargo::cargo_bin!("context-cli"));
     let current = current_cmd
+        .env("CONTEXT_HOME", &home)
         .current_dir(temp.path())
         .args(["--json", "project", "current"])
         .assert()
@@ -42,6 +47,7 @@ fn set_updates_current_and_is_used_by_other_commands() -> Result<()> {
 
     let mut ls_cmd = Command::new(assert_cmd::cargo::cargo_bin!("context-cli"));
     let ls = ls_cmd
+        .env("CONTEXT_HOME", &home)
         .current_dir(temp.path())
         .args(["--json", "ls"])
         .assert()
@@ -55,9 +61,11 @@ fn set_updates_current_and_is_used_by_other_commands() -> Result<()> {
 #[test]
 fn list_returns_known_projects() -> Result<()> {
     let temp = tempdir()?;
+    let home = temp.path().join("home");
 
     let mut set_cmd = Command::new(assert_cmd::cargo::cargo_bin!("context-cli"));
     set_cmd
+        .env("CONTEXT_HOME", &home)
         .current_dir(temp.path())
         .args(["--json", "project", "set", "alpha"])
         .assert()
@@ -65,6 +73,7 @@ fn list_returns_known_projects() -> Result<()> {
 
     let mut set_cmd2 = Command::new(assert_cmd::cargo::cargo_bin!("context-cli"));
     set_cmd2
+        .env("CONTEXT_HOME", &home)
         .current_dir(temp.path())
         .args(["--json", "project", "set", "bravo"])
         .assert()
@@ -72,6 +81,7 @@ fn list_returns_known_projects() -> Result<()> {
 
     let mut list_cmd = Command::new(assert_cmd::cargo::cargo_bin!("context-cli"));
     let list = list_cmd
+        .env("CONTEXT_HOME", &home)
         .current_dir(temp.path())
         .args(["--json", "project", "list"])
         .assert()

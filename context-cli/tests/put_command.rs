@@ -3,12 +3,14 @@ use std::io::Write;
 use anyhow::Result;
 use assert_cmd::Command;
 use context_core::{Document, SourceType};
-use tempfile::NamedTempFile;
+use tempfile::{tempdir, NamedTempFile};
 
 #[test]
 fn put_accepts_stdin_and_outputs_json() -> Result<()> {
+    let temp = tempdir()?;
     let mut cmd = Command::new(assert_cmd::cargo::cargo_bin!("context-cli"));
     let assert = cmd
+        .env("CONTEXT_HOME", temp.path())
         .args([
             "--project",
             "demo-project",
@@ -44,11 +46,13 @@ fn put_accepts_stdin_and_outputs_json() -> Result<()> {
 
 #[test]
 fn put_supports_file_input_without_json() -> Result<()> {
+    let temp = tempdir()?;
     let mut temp_file = NamedTempFile::new()?;
     writeln!(temp_file, "file body")?;
 
     let mut cmd = Command::new(assert_cmd::cargo::cargo_bin!("context-cli"));
     let assert = cmd
+        .env("CONTEXT_HOME", temp.path())
         .args([
             "put",
             "--file",
@@ -69,8 +73,14 @@ fn put_supports_file_input_without_json() -> Result<()> {
 
 #[test]
 fn put_fails_without_input() -> Result<()> {
+    let temp = tempdir()?;
     let mut cmd = Command::new(assert_cmd::cargo::cargo_bin!("context-cli"));
-    let assert = cmd.arg("put").write_stdin("").assert().failure();
+    let assert = cmd
+        .env("CONTEXT_HOME", temp.path())
+        .arg("put")
+        .write_stdin("")
+        .assert()
+        .failure();
 
     let output = assert.get_output();
     assert_eq!(output.status.code(), Some(1));

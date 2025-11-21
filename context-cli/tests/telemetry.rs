@@ -9,7 +9,8 @@ fn logs_include_scenario_project_and_command() {
     let temp = tempdir().unwrap();
 
     let mut cmd = cargo_bin_cmd!("context-cli");
-    cmd.env("CONTEXT_LOG_DIR", temp.path())
+    cmd.env("CONTEXT_HOME", temp.path())
+        .env("CONTEXT_LOG_DIR", temp.path())
         .env("CONTEXT_SCENARIO", "scn-cli")
         .args(["--project", "proj-cli"])
         .arg("ls");
@@ -41,7 +42,8 @@ fn debug_bundle_collects_logs() {
     // Produce some logs
     {
         let mut cmd = cargo_bin_cmd!("context-cli");
-        cmd.env("CONTEXT_LOG_DIR", &log_dir)
+        cmd.env("CONTEXT_HOME", temp.path())
+            .env("CONTEXT_LOG_DIR", &log_dir)
             .env("CONTEXT_SCENARIO", "bundle-scn")
             .arg("ls");
         cmd.output().unwrap();
@@ -50,7 +52,8 @@ fn debug_bundle_collects_logs() {
     let bundle_path = temp.path().join("bundle.zip");
     {
         let mut cmd = cargo_bin_cmd!("context-cli");
-        cmd.env("CONTEXT_LOG_DIR", &log_dir)
+        cmd.env("CONTEXT_HOME", temp.path())
+            .env("CONTEXT_LOG_DIR", &log_dir)
             .arg("debug-bundle")
             .arg("--scenario")
             .arg("bundle-scn")

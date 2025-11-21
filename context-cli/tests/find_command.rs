@@ -1,11 +1,14 @@
 use anyhow::Result;
 use assert_cmd::Command;
 use context_core::Document;
+use tempfile::tempdir;
 
 #[test]
 fn find_returns_json_hits() -> Result<()> {
+    let temp = tempdir()?;
     let mut cmd = Command::new(assert_cmd::cargo::cargo_bin!("context-cli"));
     let assert = cmd
+        .env("CONTEXT_HOME", temp.path())
         .args([
             "--project",
             "demo-project",
@@ -32,8 +35,13 @@ fn find_returns_json_hits() -> Result<()> {
 
 #[test]
 fn find_prints_human_readable_when_not_json() -> Result<()> {
+    let temp = tempdir()?;
     let mut cmd = Command::new(assert_cmd::cargo::cargo_bin!("context-cli"));
-    let assert = cmd.args(["find", "hello world"]).assert().success();
+    let assert = cmd
+        .env("CONTEXT_HOME", temp.path())
+        .args(["find", "hello world"])
+        .assert()
+        .success();
 
     let stdout = String::from_utf8_lossy(&assert.get_output().stdout);
     assert!(stdout.contains("Found"));
@@ -45,8 +53,10 @@ fn find_prints_human_readable_when_not_json() -> Result<()> {
 
 #[test]
 fn find_rejects_zero_limit() -> Result<()> {
+    let temp = tempdir()?;
     let mut cmd = Command::new(assert_cmd::cargo::cargo_bin!("context-cli"));
     let assert = cmd
+        .env("CONTEXT_HOME", temp.path())
         .args(["find", "hello", "--limit", "0"])
         .assert()
         .failure();
