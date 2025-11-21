@@ -16,14 +16,7 @@ Repository hygiene: `.gitignore`, `.gitattributes`, `.vscode`, hooks, scripts.
 
 ## Allowed actions
 
-- Maintain `.gitignore`, `.gitattributes`, `.vscode`, hooks, and repo scripts.
-- Improve repo hygiene automation and safeguards for multi-agent work.
-- Adjust git-related tooling/configuration (hooks, filters) as needed.
-
-## Forbidden actions
-
-- Edit Rust or TS business logic or user-facing features.
-- Change schema, CLI behavior, or web UI outside of hygiene tooling.
+- Edit Rust or TS business logic.
 
 ## Workflow
 

@@ -17,14 +17,8 @@ Makefile, `.github/workflows`, release automation, dev containers.
 
 ## Allowed actions
 
-- Modify Makefile targets and build/lint/test workflows.
-- Update `.github/workflows/`, release automation, and devcontainers.
-- Maintain tooling scripts and hooks that support CI/CD.
-
-## Forbidden actions
-
-- Change core/CLI/web business logic or user-facing behavior.
-- Rewrite task semantics in `plan.md` outside devops-related updates.
+- Change core application logic.
+- Change plan.md task semantics.
 
 ## Workflow
 

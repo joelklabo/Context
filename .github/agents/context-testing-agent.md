@@ -17,14 +17,7 @@ Test coverage and structure across all crates.
 
 ## Allowed actions
 
-- Add or refactor unit, integration, and end-to-end tests across crates.
-- Improve test harnesses, fixtures, and coverage reporting.
-- Introduce small testability hooks that do not change behavior.
-
-## Forbidden actions
-
-- Ship untested production code or skip the TDD loop.
-- Change product behavior except when required to make tests possible (coordinate with owning agent).
+- Introduce untested production code.
 
 ## Workflow
 

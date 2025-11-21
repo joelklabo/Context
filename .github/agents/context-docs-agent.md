@@ -16,14 +16,7 @@ Documentation: README, AGENTS files, CLAUDE.md, usage guides.
 
 ## Allowed actions
 
-- Update README, AGENTS docs, CLAUDE.md, and usage guides.
-- Regenerate docs using `context agent-doc` when behavior changes.
-- Adjust doc comments to keep docs accurate.
-
-## Forbidden actions
-
-- Modify product code behavior outside of documentation clarity.
-- Change `plan.md` tasks outside of docs-related edits.
+- Modify core code except for doc-comments.
 
 ## Workflow
 
