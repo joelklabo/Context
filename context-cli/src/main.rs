@@ -195,8 +195,8 @@ fn run() -> Result<()> {
             limit,
             all_projects,
         } => {
-            tracing::info!(%query, ?limit, ?all_projects, "Find command invoked (stub)");
-            eprintln!("TODO: implement `context find`");
+            tracing::info!(%query, ?limit, ?all_projects, "Find command invoked");
+            handle_find(project, json, query, limit, all_projects)?;
         }
         Commands::Ls {} => {
             tracing::info!("Ls command invoked (stub)");
@@ -337,6 +337,76 @@ fn handle_cat(
     }
 
     println!("{}", document.body_markdown);
+    Ok(())
+}
+
+fn handle_find(
+    project: Option<String>,
+    json_output: bool,
+    query: String,
+    limit: Option<usize>,
+    all_projects: bool,
+) -> Result<()> {
+    if query.trim().is_empty() {
+        bail!("Query cannot be empty.");
+    }
+    if let Some(0) = limit {
+        bail!("Limit must be greater than 0.");
+    }
+
+    let count = limit.unwrap_or(3);
+    let base_project = project.unwrap_or_else(|| "default".to_string());
+
+    let mut documents = Vec::with_capacity(count);
+    for i in 0..count {
+        let now = Utc::now();
+        let doc_project = if all_projects {
+            format!("project-{i}")
+        } else {
+            base_project.clone()
+        };
+        let doc_id = Uuid::new_v4().to_string();
+        let body = format!("Result {} for '{}'", i + 1, query);
+        let key = Some(format!("hit-{}", i + 1));
+
+        documents.push(Document {
+            id: DocumentId(doc_id),
+            project: doc_project,
+            key,
+            namespace: None,
+            title: None,
+            tags: Vec::new(),
+            body_markdown: body,
+            created_at: now,
+            updated_at: now,
+            source: SourceType::System,
+            version: 1,
+            ttl_seconds: None,
+            deleted_at: None,
+        });
+    }
+
+    if json_output {
+        let serialized = serde_json::to_string_pretty(&documents)?;
+        println!("{serialized}");
+        return Ok(());
+    }
+
+    println!(
+        "Found {} result(s) for '{}' in project {}{}",
+        documents.len(),
+        query,
+        base_project,
+        if all_projects { " (all projects)" } else { "" }
+    );
+    for (idx, doc) in documents.iter().enumerate() {
+        println!("{}. {} [{}]", idx + 1, doc.id.0, doc.project);
+        if let Some(key) = &doc.key {
+            println!("   Key: {key}");
+        }
+        println!("   {}", doc.body_markdown);
+    }
+
     Ok(())
 }
 

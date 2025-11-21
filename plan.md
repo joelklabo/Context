@@ -208,7 +208,7 @@ The CLI already exposes stub variants for these commands; they currently just lo
       @area(cli) @owner(context-cli-agent) @status(done,commit=bc80744) @scenario(2025-11-21T05:19:59Z-cli-012)
 
 - [ ] cli-013: implement `context find` (search API, JSON output) with tests
-      @area(cli) @owner(unassigned) @status(unclaimed)
+      @area(cli) @owner(context-cli-agent) @status(in-progress) @scenario(2025-11-21T05:24:02Z-cli-013)
 
 - [ ] cli-014: implement `context ls` (list docs) with tests
       @area(cli) @owner(unassigned) @status(unclaimed)
