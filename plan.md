@@ -228,8 +228,8 @@ The CLI already exposes stub variants for these commands; they currently just lo
 - [x] cli-018: implement `context debug-bundle` to gather logs + traces into an archive
       @area(cli) @owner(context-cli-agent) @status(done,commit=943466e) @scenario(2025-11-21T06:32:00Z-cli-018)
 
-- [ ] cli-019: implement `context agent-config` to emit Codex/Claude/Copilot agent configs
-      @area(cli) @owner(context-cli-agent) @status(in-progress) @scenario(2025-11-21T06:48:23Z-cli-019)
+- [x] cli-019: implement `context agent-config` to emit Codex/Claude/Copilot agent configs
+      @area(cli) @owner(context-cli-agent) @status(done,commit=b7d7e1c) @scenario(2025-11-21T06:48:23Z-cli-019)
 
 - [ ] cli-020: flesh out `context agent-doc` to generate full agent usage docs
       @area(cli) @owner(unassigned) @status(unclaimed)
