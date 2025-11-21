@@ -1,9 +1,16 @@
-use std::env;
+use std::{
+    env, fs,
+    io::Write,
+    path::{Path, PathBuf},
+};
 
 use anyhow::Result;
+use chrono::Utc;
 use clap::{Parser, Subcommand};
 use context_telemetry::{context_span, init_tracing, LogContext};
 use tracing::Span;
+use walkdir::WalkDir;
+use zip::{write::FileOptions, CompressionMethod, ZipWriter};
 
 /// context – CLI entrypoint (skeleton)
 #[derive(Parser)]
@@ -275,15 +282,19 @@ fn main() -> Result<()> {
             eprintln!("TODO: implement `context web-dev` wrapper");
         }
         Commands::DebugBundle { scenario, out } => {
+            let scenario_id = scenario
+                .clone()
+                .or_else(|| log_context.scenario_id.map(str::to_string))
+                .or_else(|| env::var("CONTEXT_SCENARIO").ok());
+            let bundle = create_debug_bundle(scenario_id.clone(), out)?;
             tracing::info!(
-                scenario_id = log_context.scenario_id,
+                scenario_id = scenario_id.as_deref(),
                 project = log_context.project,
                 command = log_context.command,
-                ?scenario,
-                ?out,
-                "DebugBundle command invoked (stub)"
+                bundle = %bundle.display(),
+                "Debug bundle created"
             );
-            eprintln!("TODO: implement `context debug-bundle`");
+            println!("{}", bundle.display());
         }
         Commands::AgentConfig { target } => {
             tracing::info!(
@@ -316,6 +327,53 @@ fn command_name(command: &Commands) -> &'static str {
         Commands::DebugBundle { .. } => "debug-bundle",
         Commands::AgentConfig { .. } => "agent-config",
     }
+}
+
+fn resolve_log_dir() -> Result<PathBuf> {
+    let log_dir = match env::var("CONTEXT_LOG_DIR") {
+        Ok(dir) if Path::new(&dir).is_absolute() => PathBuf::from(dir),
+        Ok(dir) => env::current_dir()?.join(dir),
+        Err(_) => env::current_dir()?.join(".context").join("logs"),
+    };
+
+    Ok(log_dir)
+}
+
+fn create_debug_bundle(scenario: Option<String>, out: Option<String>) -> Result<PathBuf> {
+    let log_dir = resolve_log_dir()?;
+    let timestamp = Utc::now().format("%Y%m%dT%H%M%SZ").to_string();
+    let bundle_path = out
+        .map(PathBuf::from)
+        .unwrap_or_else(|| PathBuf::from(format!("debug-bundle-{timestamp}.zip")));
+
+    let file = fs::File::create(&bundle_path)?;
+    let mut writer = ZipWriter::new(file);
+    let options = FileOptions::default().compression_method(CompressionMethod::Deflated);
+
+    let meta = serde_json::json!({
+        "scenario_id": scenario,
+        "created_at": timestamp,
+        "log_dir": log_dir,
+    });
+    writer.start_file("meta.json", options)?;
+    writer.write_all(meta.to_string().as_bytes())?;
+
+    if log_dir.exists() {
+        for entry in WalkDir::new(&log_dir)
+            .into_iter()
+            .filter_map(Result::ok)
+            .filter(|e| e.file_type().is_file())
+        {
+            let rel = entry.path().strip_prefix(&log_dir).unwrap();
+            let zip_path = Path::new("logs").join(rel);
+            writer.start_file(zip_path.to_string_lossy(), options)?;
+            let data = fs::read(entry.path())?;
+            writer.write_all(&data)?;
+        }
+    }
+
+    writer.finish()?;
+    Ok(bundle_path)
 }
 
 fn command_span(log_context: LogContext<'_>, command: &Commands) -> Span {

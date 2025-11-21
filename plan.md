@@ -267,7 +267,7 @@ The CLI already exposes stub variants for these commands; they currently just lo
       @area(obs) @owner(context-devops-agent) @status(done,commit=cac9828ae1fe31e8a59114b9873de9112f1f6d35) @scenario(2025-11-21T05:16:35Z-obs012)
 
 - [ ] obs-013: implement `context debug-bundle` backend (log collection, trace export)
-      @area(obs) @owner(unassigned) @status(unclaimed)
+      @area(obs) @owner(context-devops-agent) @status(in-progress) @scenario(2025-11-21T05:22:43Z-obs013)
 
 ---
 
