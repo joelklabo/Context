@@ -53,3 +53,5 @@ pub trait Storage: Send + Sync {
     async fn get_by_key(&self, project: &ProjectId, key: &str) -> Result<Option<Document>>;
     async fn search(&self, query: SearchQuery) -> Result<Vec<SearchHit>>;
 }
+
+pub mod sqlite;

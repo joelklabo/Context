@@ -58,9 +58,7 @@ fn run() -> Result<(), String> {
                 raw_status: None,
             });
             current_index = Some(tasks.len() - 1);
-        } else if trimmed.starts_with('@')
-            || line.contains("@owner(")
-            || line.contains("@status(")
+        } else if trimmed.starts_with('@') || line.contains("@owner(") || line.contains("@status(")
         {
             if let Some(idx) = current_index {
                 let t = &mut tasks[idx];

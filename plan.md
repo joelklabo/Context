@@ -179,7 +179,7 @@ Conventions:
 ### 4.1 Storage & schema
 
 - [ ] core-010: design SQLite schema and migrations for projects, documents, versions, FTS5 index
-      @area(core) @owner(unassigned) @status(unclaimed)
+      @area(core) @owner(context-core-agent) @status(in-progress) @scenario(2025-11-20T20:27:16-08:00)
 
 - [ ] core-011: implement SQLite-backed `Storage` (put/get/search) with basic tests
       @area(core) @owner(unassigned) @status(unclaimed)
@@ -199,7 +199,7 @@ Conventions:
 The CLI already exposes stub variants for these commands; they currently just log/print “TODO”. The tasks below are about **tests + real behavior**.
 
 - [ ] cli-010: implement `context put` (stdin/file, project/key, tags) with tests
-      @area(cli) @owner(unassigned) @status(unclaimed)
+      @area(cli) @owner(context-cli-agent) @status(in-progress) @scenario(2025-11-21T04:27:35Z-cli-010)
 
 - [ ] cli-011: implement `context get` (key/id, project, format) with tests
       @area(cli) @owner(unassigned) @status(unclaimed)
@@ -258,7 +258,7 @@ The CLI already exposes stub variants for these commands; they currently just lo
 ## 7. Upcoming work – Observability
 
 - [ ] obs-010: wire `tracing` with JSON logs to file + pretty TTY logs
-      @area(obs) @owner(unassigned) @status(unclaimed)
+      @area(obs) @owner(context-devops-agent) @status(in-progress) @scenario(2025-11-21T04:27:39Z-obs010)
 
 - [ ] obs-011: add scenario_id + project + command fields to all CLI/web logs
       @area(obs) @owner(unassigned) @status(unclaimed)
