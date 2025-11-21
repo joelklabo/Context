@@ -22,6 +22,8 @@ This file defines the main agents for the `context` project.
 - `context-testing-agent` – owns tests and coverage across crates.
 - `context-git-agent` – owns repo hygiene (.gitignore, .gitattributes, .vscode, hooks).
 - `context-docs-agent` – owns README, AGENTS, CLAUDE/agent docs.
+- `context-research-agent` – researches features and writes briefs stored in Context.
+- `context-planner-agent` – turns research into plan.md-style implementation plans.
 
 Each agent has a dedicated profile in `agents/*.md`.
 

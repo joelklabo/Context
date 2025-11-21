@@ -34,3 +34,13 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Run CI via Makefile
         run: make ci
+      - name: Upload test logs on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: logs-${{ matrix.os }}-${{ github.run_id }}
+          path: |
+            **/*.log
+            target/debug/deps/*.dSYM/**/*
+            target/debug/deps/*.pdb
+            target/debug/deps/*.exe.stackdump
