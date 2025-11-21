@@ -24,4 +24,10 @@ fn logs_include_scenario_project_and_command() {
     assert_eq!(fields["scenario_id"], "scn-cli");
     assert_eq!(fields["project"], "proj-cli");
     assert_eq!(fields["command"], "ls");
+
+    let spans = json["spans"].as_array().cloned().unwrap_or_default();
+    assert!(
+        spans.iter().any(|span| span["name"] == "cli.ls"),
+        "expected cli.ls span in log entry"
+    );
 }

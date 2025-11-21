@@ -10,3 +10,7 @@ tokio = { version = "1", features = ["macros", "rt-multi-thread"] }
 tracing = "0.1"
 context-telemetry = { path = "../context-telemetry" }
 context-agent = { path = "../context-agent" }
+
+[dev-dependencies]
+serde_json = "1"
+tempfile = "3"

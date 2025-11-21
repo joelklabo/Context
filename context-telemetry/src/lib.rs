@@ -79,6 +79,7 @@ fn build_dispatch(
         .with_ansi(false)
         .with_writer(file_writer)
         .with_target(true)
+        .with_current_span(true)
         .with_span_list(true);
 
     let console_layer = fmt::layer().with_writer(console_writer).with_target(true);
@@ -211,6 +212,45 @@ mod tests {
         assert_eq!(json["fields"]["scenario_id"], "scn-123");
         assert_eq!(json["fields"]["project"], "proj-1");
         assert_eq!(json["fields"]["command"], "ls");
+    }
+
+    #[test]
+    fn json_logs_include_span_names() {
+        let temp = tempfile::tempdir().unwrap();
+        let writer = TestWriter::default();
+
+        let (dispatch, guard) = build_dispatch(
+            "context-cli",
+            temp.path().to_path_buf(),
+            EnvFilter::new("info"),
+            writer.make_writer(),
+        )
+        .unwrap();
+
+        tracing::dispatcher::with_default(&dispatch, || {
+            let span = context_span(LogContext {
+                scenario_id: Some("scn-999"),
+                project: Some("proj-span"),
+                command: Some("put"),
+            });
+            let _guard = span.enter();
+            let op_span = tracing::info_span!("cli.put");
+            let _op = op_span.enter();
+            tracing::info!("within op span");
+        });
+
+        drop(guard);
+
+        let log_path = temp.path().join("context-cli.jsonl");
+        let contents = std::fs::read_to_string(log_path).unwrap();
+        let first = contents.lines().next().unwrap();
+        let json: Value = serde_json::from_str(first).unwrap();
+
+        let spans = json["spans"].as_array().cloned().unwrap_or_default();
+        assert!(
+            spans.iter().any(|span| span["name"] == "cli.put"),
+            "expected to find cli.put span in {spans:?}"
+        );
     }
 
     #[test]

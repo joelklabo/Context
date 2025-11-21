@@ -396,6 +396,8 @@ dependencies = [
  "axum",
  "context-agent",
  "context-telemetry",
+ "serde_json",
+ "tempfile",
  "tokio",
  "tracing",
 ]
