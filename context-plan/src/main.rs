@@ -1,4 +1,5 @@
 use regex::Regex;
+use std::collections::HashMap;
 use std::fs;
 use std::process::Command;
 
@@ -6,7 +7,6 @@ use std::process::Command;
 struct Task {
     id: String,
     owner: Option<String>,
-
     status: Option<String>,
     raw_status: Option<String>,
 }
@@ -29,7 +29,26 @@ fn run() -> Result<(), String> {
     let mut tasks: Vec<Task> = Vec::new();
     let mut current_index: Option<usize> = None;
 
+    // Track whether we're inside a fenced code block (``` ... ```).
+    // Lines inside code fences are ignored for task parsing so examples don't trip validation.
+    let mut in_code_block = false;
+
     for line in contents.lines() {
+        let trimmed = line.trim_start();
+
+        // Toggle code block state on lines starting with ```
+        if trimmed.starts_with("```") {
+            in_code_block = !in_code_block;
+            // When entering or leaving a code block, do not associate this line with a task.
+            current_index = None;
+            continue;
+        }
+
+        // Skip any content inside fenced code blocks
+        if in_code_block {
+            continue;
+        }
+
         if let Some(caps) = task_re.captures(line) {
             let id = caps.get(2).unwrap().as_str().to_string();
             tasks.push(Task {
@@ -39,7 +58,7 @@ fn run() -> Result<(), String> {
                 raw_status: None,
             });
             current_index = Some(tasks.len() - 1);
-        } else if line.trim_start().starts_with("@")
+        } else if trimmed.starts_with('@')
             || line.contains("@owner(")
             || line.contains("@status(")
         {
@@ -116,8 +135,7 @@ fn run() -> Result<(), String> {
     }
 
     // Ensure each owner has at most one in-progress task
-    let mut owner_in_progress: std::collections::HashMap<String, Vec<String>> =
-        std::collections::HashMap::new();
+    let mut owner_in_progress: HashMap<String, Vec<String>> = HashMap::new();
     for t in &tasks {
         if let (Some(owner), Some(status)) = (&t.owner, &t.status) {
             if status == "in-progress" {
