@@ -295,7 +295,7 @@ The CLI already exposes stub variants for these commands; they currently just lo
 
 ## 8. Upcoming work – Agents & docs
 
-- [ ] agents-010: define Codex CLI agents in `AGENTS.context.md` using `context agent-doc`
+- [ ] agents-010: define Codex CLI agents in `AGENTS.md` using `context agent-doc`
       @area(agents) @owner(unassigned) @status(unclaimed)
 
 - [ ] agents-011: define Claude Code subagents and commands under `.claude/`

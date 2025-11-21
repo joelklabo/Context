@@ -16,11 +16,18 @@ Repository hygiene: `.gitignore`, `.gitattributes`, `.vscode`, hooks, scripts.
 
 ## Allowed actions
 
-- Edit Rust or TS business logic.
+- Maintain `.gitignore`, `.gitattributes`, `.vscode`, hooks, and repo scripts.
+- Improve repo hygiene automation and safeguards for multi-agent work.
+- Adjust git-related tooling/configuration (hooks, filters) as needed.
+
+## Forbidden actions
+
+- Edit Rust or TS business logic or user-facing features.
+- Change schema, CLI behavior, or web UI outside of hygiene tooling.
 
 ## Workflow
 
-Follow the global rules in `AGENTS.context.md` and `plan.md`:
+Follow the global rules in `AGENTS.md` and `plan.md`:
 
 1. Pick an unclaimed task in `plan.md` for your area.
 2. Set `@owner(context-git-agent)` and `@status(in-progress)`.

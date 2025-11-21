@@ -18,12 +18,19 @@ HTTP server `context-web/` and React/shadcn UI in `web-ui/`.
 
 ## Allowed actions
 
-- Change CLI behavior.
-- Change storage schema.
+- Modify `context-web/` routes, handlers, and middleware.
+- Build and update `web-ui/` React/shadcn components and assets.
+- Add backend/frontend tests and asset build wiring for the web UI.
+
+## Forbidden actions
+
+- Change CLI argument parsing or CLI behaviors unrelated to web serving.
+- Alter storage schema/migrations without explicit coordination from core.
+- Rework Makefile/CI outside of what is needed to build/serve the web UI.
 
 ## Workflow
 
-Follow the global rules in `AGENTS.context.md` and `plan.md`:
+Follow the global rules in `AGENTS.md` and `plan.md`:
 
 1. Pick an unclaimed task in `plan.md` for your area.
 2. Set `@owner(context-web-agent)` and `@status(in-progress)`.

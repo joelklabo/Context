@@ -23,7 +23,7 @@ CLI binary `context-cli/`: subcommands, flags, JSON output, exit codes.
 
 ## Workflow
 
-Follow the global rules in `AGENTS.context.md` and `plan.md`:
+Follow the global rules in `AGENTS.md` and `plan.md`:
 
 1. Pick an unclaimed task in `plan.md` for your area.
 2. Set `@owner(context-cli-agent)` and `@status(in-progress)`.
@@ -32,7 +32,8 @@ Follow the global rules in `AGENTS.context.md` and `plan.md`:
 5. Commit using `./scripts/runner.sh "<id>: <short message> [agent:context-cli-agent]"`.
 6. Update `plan.md` to mark the task done with `@status(done,commit=<hash>)`.
 
-Do NOT:
+## Forbidden actions
+
 - Modify core storage behavior or schema.
 - Touch `context-web/`, `web-ui/`, Makefile, or CI workflows.
 - Edit another agent’s in-progress task in `plan.md`.

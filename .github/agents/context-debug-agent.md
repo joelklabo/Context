@@ -17,12 +17,18 @@ Tracing, logging, scenario IDs, debug bundles, Dev Web UI debugging.
 
 ## Allowed actions
 
-- Change business semantics of commands.
-- Modify plan.md outside own tasks.
+- Add or refine tracing spans and structured logging across crates.
+- Improve debug bundle collection/export paths.
+- Adjust logging configuration and instrumentation without altering business rules.
+
+## Forbidden actions
+
+- Change command semantics or data models beyond instrumentation needs.
+- Modify `plan.md` outside your own tasks.
 
 ## Workflow
 
-Follow the global rules in `AGENTS.context.md` and `plan.md`:
+Follow the global rules in `AGENTS.md` and `plan.md`:
 
 1. Pick an unclaimed task in `plan.md` for your area.
 2. Set `@owner(context-debug-agent)` and `@status(in-progress)`.
