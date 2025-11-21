@@ -198,8 +198,8 @@ Conventions:
 
 The CLI already exposes stub variants for these commands; they currently just log/print “TODO”. The tasks below are about **tests + real behavior**.
 
-- [ ] cli-010: implement `context put` (stdin/file, project/key, tags) with tests
-      @area(cli) @owner(context-cli-agent) @status(in-progress) @scenario(2025-11-21T04:27:35Z-cli-010)
+- [x] cli-010: implement `context put` (stdin/file, project/key, tags) with tests
+      @area(cli) @owner(context-cli-agent) @status(done,commit=de98b23) @scenario(2025-11-21T04:27:35Z-cli-010)
 
 - [ ] cli-011: implement `context get` (key/id, project, format) with tests
       @area(cli) @owner(unassigned) @status(unclaimed)
