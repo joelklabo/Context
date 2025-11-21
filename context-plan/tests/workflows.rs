@@ -10,8 +10,10 @@ fn ci_uses_supported_lychee_action_version() {
     let workflow_path = repo_root.join(".github/workflows/ci.yml");
     let workflow =
         std::fs::read_to_string(&workflow_path).expect("read ci workflow file from repo root");
-    let re =
-        Regex::new(r"lycheeverse/lychee-action@(?P<ver>[^\s]+)").expect("compile version regex");
+    let re = Regex::new(
+        r"(?s)- name: Link check.*?\n\s+if: matrix\.os == 'ubuntu-latest'\n\s+uses: lycheeverse/lychee-action@(?P<ver>\S+).*?args:\s*--verbose --no-progress \.",
+    )
+    .expect("compile link-check regex");
 
     let caps = re
         .captures(&workflow)

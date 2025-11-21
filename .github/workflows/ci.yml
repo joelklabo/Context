@@ -27,9 +27,10 @@ jobs:
             ${{ runner.os }}-cargo-
       - uses: dtolnay/rust-toolchain@stable
       - name: Link check (docs + README)
+        if: matrix.os == 'ubuntu-latest'
         uses: lycheeverse/lychee-action@v2.7.0
         with:
-          args: --verbose --no-progress './**/*.md'
+          args: --verbose --no-progress .
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Run CI via Makefile
