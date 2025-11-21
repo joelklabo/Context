@@ -213,8 +213,8 @@ The CLI already exposes stub variants for these commands; they currently just lo
 - [x] cli-014: implement `context ls` (list docs) with tests
       @area(cli) @owner(context-cli-agent) @status(done,commit=ab5ebe5) @scenario(2025-11-21T05:28:05Z-cli-014)
 
-- [ ] cli-015: implement `context rm` (soft delete) + `context gc` (hard delete/vacuum) with tests
-      @area(cli) @owner(unassigned) @status(unclaimed)
+- [x] cli-015: implement `context rm` (soft delete) + `context gc` (hard delete/vacuum) with tests
+      @area(cli) @owner(context-cli-agent) @status(done,commit=f4a52d7) @scenario(2025-11-21T05:28:05Z-cli-014)
 
 - [ ] cli-016: implement `context web` wrapper around `context-web` server with tests (at least smoke)
       @area(cli) @owner(unassigned) @status(unclaimed)
