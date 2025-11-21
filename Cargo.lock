@@ -359,6 +359,7 @@ dependencies = [
  "context-agent",
  "context-core",
  "context-telemetry",
+ "serde",
  "serde_json",
  "tempfile",
  "tracing",

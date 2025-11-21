@@ -9,6 +9,7 @@ use chrono::Utc;
 use clap::{Parser, Subcommand};
 use context_core::{Document, DocumentId, SourceType};
 use context_telemetry::{context_span, init_tracing, LogContext};
+use serde::{Deserialize, Serialize};
 use tracing::Span;
 use uuid::Uuid;
 use walkdir::WalkDir;
@@ -143,6 +144,25 @@ enum Commands {
         #[arg(long, default_value = "all")]
         target: String,
     },
+
+    /// Manage default project selection
+    Project {
+        #[command(subcommand)]
+        action: ProjectCommands,
+    },
+}
+
+#[derive(Subcommand)]
+enum ProjectCommands {
+    /// Show the current project in use
+    Current,
+    /// Set the default project for this workspace
+    Set {
+        /// Project identifier to set as default
+        project: String,
+    },
+    /// List known projects
+    List,
 }
 
 fn main() {
@@ -162,7 +182,7 @@ fn run() -> Result<()> {
     } = Cli::parse();
 
     let command_name = command_name(&command).to_string();
-    let project_label = project.clone().unwrap_or_else(|| "default".to_string());
+    let project_label = resolve_project(project.clone())?;
     let scenario = scenario.or_else(|| env::var("CONTEXT_SCENARIO").ok());
 
     let log_context = LogContext {
@@ -175,6 +195,7 @@ fn run() -> Result<()> {
     let _span_guard = span.enter();
     let command_span = command_span(log_context, &command);
     let _command_guard = command_span.enter();
+    let resolved_project = Some(project_label.clone());
     tracing::info!(
         scenario_id = log_context.scenario_id,
         project = log_context.project,
@@ -206,7 +227,7 @@ fn run() -> Result<()> {
                 tags = ?tags,
                 "Put command invoked"
             );
-            handle_put(project, json, key, file, tags)?;
+            handle_put(resolved_project.clone(), json, key, file, tags)?;
         }
         Commands::Get { key, id, format } => {
             tracing::info!(
@@ -218,7 +239,7 @@ fn run() -> Result<()> {
                 ?format,
                 "Get command invoked"
             );
-            handle_get(project, json, key, id, format)?;
+            handle_get(resolved_project.clone(), json, key, id, format)?;
         }
         Commands::Cat { key, id } => {
             tracing::info!(
@@ -229,7 +250,7 @@ fn run() -> Result<()> {
                 ?id,
                 "Cat command invoked"
             );
-            handle_cat(project, json, key, id)?;
+            handle_cat(resolved_project.clone(), json, key, id)?;
         }
         Commands::Find {
             query,
@@ -245,7 +266,7 @@ fn run() -> Result<()> {
                 ?all_projects,
                 "Find command invoked"
             );
-            handle_find(project, json, query, limit, all_projects)?;
+            handle_find(resolved_project.clone(), json, query, limit, all_projects)?;
         }
         Commands::Ls {} => {
             tracing::info!(
@@ -254,7 +275,7 @@ fn run() -> Result<()> {
                 command = log_context.command,
                 "Ls command invoked"
             );
-            handle_ls(project, json)?;
+            handle_ls(resolved_project.clone(), json)?;
         }
         Commands::Rm { key, id, force } => {
             tracing::info!(
@@ -266,7 +287,7 @@ fn run() -> Result<()> {
                 ?force,
                 "Rm command invoked"
             );
-            handle_rm(project, json, key, id, force)?;
+            handle_rm(resolved_project.clone(), json, key, id, force)?;
         }
         Commands::Gc { dry_run } => {
             tracing::info!(
@@ -276,7 +297,7 @@ fn run() -> Result<()> {
                 ?dry_run,
                 "Gc command invoked"
             );
-            handle_gc(project, json, dry_run)?;
+            handle_gc(resolved_project.clone(), json, dry_run)?;
         }
         Commands::Web { port } => {
             tracing::info!(
@@ -329,6 +350,21 @@ fn run() -> Result<()> {
                 "AgentConfig command invoked"
             );
             eprintln!("TODO: implement `context agent-config`");
+        }
+        Commands::Project { action } => {
+            tracing::info!(
+                scenario_id = log_context.scenario_id,
+                project = log_context.project,
+                command = log_context.command,
+                "Project command invoked"
+            );
+            match action {
+                ProjectCommands::Current => handle_project_current(json, project)?,
+                ProjectCommands::Set {
+                    project: new_project,
+                } => handle_project_set(json, new_project)?,
+                ProjectCommands::List => handle_project_list(json)?,
+            }
         }
     }
 
@@ -707,6 +743,134 @@ fn handle_gc(project: Option<String>, json_output: bool, dry_run: bool) -> Resul
     Ok(())
 }
 
+#[derive(Debug, Serialize, Deserialize)]
+struct ProjectConfig {
+    current: Option<String>,
+    known: Vec<String>,
+}
+
+impl Default for ProjectConfig {
+    fn default() -> Self {
+        Self {
+            current: None,
+            known: vec!["default".to_string()],
+        }
+    }
+}
+
+impl ProjectConfig {
+    fn ensure_known(&mut self, project: &str) {
+        if project.trim().is_empty() {
+            return;
+        }
+        if !self.known.contains(&project.to_string()) {
+            self.known.push(project.to_string());
+        }
+    }
+}
+
+fn resolve_project(project_arg: Option<String>) -> Result<String> {
+    if let Some(explicit) = project_arg {
+        return Ok(explicit);
+    }
+
+    if let Ok(env_project) = env::var("CONTEXT_PROJECT") {
+        if !env_project.trim().is_empty() {
+            return Ok(env_project);
+        }
+    }
+
+    let config = load_project_config()?;
+    Ok(config.current.unwrap_or_else(|| "default".to_string()))
+}
+
+fn handle_project_current(json_output: bool, project_arg: Option<String>) -> Result<()> {
+    let project = resolve_project(project_arg)?;
+    if json_output {
+        let payload = serde_json::json!({ "project": project });
+        println!("{}", serde_json::to_string_pretty(&payload)?);
+    } else {
+        println!("Current project: {project}");
+    }
+    Ok(())
+}
+
+fn handle_project_set(json_output: bool, project: String) -> Result<()> {
+    let project = project.trim().to_string();
+    if project.is_empty() {
+        bail!("Project name cannot be empty.");
+    }
+
+    let mut config = load_project_config()?;
+    config.current = Some(project.clone());
+    config.ensure_known("default");
+    config.ensure_known(&project);
+    save_project_config(&config)?;
+
+    if json_output {
+        let payload = serde_json::json!({
+            "status": "ok",
+            "project": project,
+        });
+        println!("{}", serde_json::to_string_pretty(&payload)?);
+    } else {
+        println!("Set current project to {project}");
+    }
+
+    Ok(())
+}
+
+fn handle_project_list(json_output: bool) -> Result<()> {
+    let mut config = load_project_config()?;
+    let current = config.current.clone();
+    if let Some(curr) = current.as_deref() {
+        config.ensure_known(curr);
+    }
+    config.ensure_known("default");
+    config.known.sort();
+    config.known.dedup();
+
+    if json_output {
+        println!("{}", serde_json::to_string_pretty(&config.known)?);
+        return Ok(());
+    }
+
+    println!("Projects:");
+    for project in &config.known {
+        println!("- {project}");
+    }
+    Ok(())
+}
+
+fn load_project_config() -> Result<ProjectConfig> {
+    let path = project_config_path()?;
+    if !path.exists() {
+        return Ok(ProjectConfig::default());
+    }
+
+    let contents = fs::read_to_string(&path)
+        .with_context(|| format!("Failed to read project config at {}", path.display()))?;
+    let mut config: ProjectConfig = serde_json::from_str(&contents)
+        .with_context(|| format!("Failed to parse project config at {}", path.display()))?;
+
+    config.ensure_known("default");
+    Ok(config)
+}
+
+fn save_project_config(config: &ProjectConfig) -> Result<()> {
+    let path = project_config_path()?;
+    let serialized = serde_json::to_string_pretty(config)?;
+    fs::write(&path, serialized)
+        .with_context(|| format!("Failed to write project config to {}", path.display()))?;
+    Ok(())
+}
+
+fn project_config_path() -> Result<PathBuf> {
+    let dir = env::current_dir()?.join(".context");
+    fs::create_dir_all(&dir)?;
+    Ok(dir.join("config.json"))
+}
+
 fn read_body(file: Option<PathBuf>) -> Result<String> {
     if let Some(path) = file {
         let contents = fs::read_to_string(&path)
@@ -745,6 +909,7 @@ fn command_name(command: &Commands) -> &'static str {
         Commands::WebDev { .. } => "web-dev",
         Commands::DebugBundle { .. } => "debug-bundle",
         Commands::AgentConfig { .. } => "agent-config",
+        Commands::Project { .. } => "project",
     }
 }
 
@@ -824,6 +989,12 @@ fn command_span(log_context: LogContext<'_>, command: &Commands) -> Span {
         ),
         Commands::AgentConfig { .. } => tracing::info_span!(
             "cli.agent-config",
+            scenario_id = log_context.scenario_id,
+            project = log_context.project,
+            command = log_context.command
+        ),
+        Commands::Project { .. } => tracing::info_span!(
+            "cli.project",
             scenario_id = log_context.scenario_id,
             project = log_context.project,
             command = log_context.command
