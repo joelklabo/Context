@@ -219,8 +219,8 @@ The CLI already exposes stub variants for these commands; they currently just lo
 - [x] cli-016: implement `context web` wrapper around `context-web` server with tests (at least smoke)
       @area(cli) @owner(context-cli-agent) @status(done,commit=dc9d31a) @scenario(2025-11-21T05:35:30Z-cli-016)
 
-- [ ] cli-017: implement `context web-dev` alias/flags for dev web UI
-      @area(cli) @owner(context-cli-agent) @status(in-progress) @scenario(2025-11-21T06:21:11Z-cli-017)
+- [x] cli-017: implement `context web-dev` alias/flags for dev web UI
+      @area(cli) @owner(context-cli-agent) @status(done,commit=5055126) @scenario(2025-11-21T06:21:11Z-cli-017)
 
 - [ ] cli-018: implement `context debug-bundle` to gather logs + traces into an archive
       @area(cli) @owner(unassigned) @status(unclaimed)
