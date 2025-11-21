@@ -132,3 +132,67 @@ async fn search_returns_matches_in_project() -> TestResult<()> {
 
     Ok(())
 }
+
+#[tokio::test]
+async fn ttl_expired_documents_are_filtered_out() -> TestResult<()> {
+    let storage = test_storage().await?;
+
+    let expired_created_at = Utc.with_ymd_and_hms(2000, 1, 1, 0, 0, 0).unwrap();
+    let mut doc = sample_document("doc-expired", "demo", "old", "expired body");
+    doc.created_at = expired_created_at;
+    doc.updated_at = expired_created_at;
+    doc.ttl_seconds = Some(60);
+
+    storage.put(doc.clone()).await?;
+
+    let fetched = storage
+        .get_by_key(&doc.project, doc.key.as_ref().unwrap())
+        .await?;
+    assert!(fetched.is_none(), "expired document should not be returned");
+
+    let hits = storage
+        .search(SearchQuery {
+            project: Some(doc.project.clone()),
+            text: "expired".to_string(),
+            limit: None,
+        })
+        .await?;
+    assert!(
+        hits.is_empty(),
+        "expired document should not appear in search"
+    );
+
+    Ok(())
+}
+
+#[tokio::test]
+async fn soft_deleted_documents_are_ignored() -> TestResult<()> {
+    let storage = test_storage().await?;
+    let mut doc = sample_document("doc-deleted", "demo", "deleted", "body");
+    doc.deleted_at = Some(Utc::now());
+    doc.version = 1;
+
+    storage.put(doc.clone()).await?;
+
+    assert!(
+        storage
+            .get_by_key(&doc.project, doc.key.as_ref().unwrap())
+            .await?
+            .is_none(),
+        "soft-deleted doc should not be fetched"
+    );
+
+    let hits = storage
+        .search(SearchQuery {
+            project: Some(doc.project.clone()),
+            text: "body".to_string(),
+            limit: None,
+        })
+        .await?;
+    assert!(
+        hits.is_empty(),
+        "soft-deleted doc should not appear in search results"
+    );
+
+    Ok(())
+}

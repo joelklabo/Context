@@ -137,7 +137,12 @@ impl Storage for SqliteStorage {
 
     async fn get_by_key(&self, project: &ProjectId, key: &str) -> Result<Option<Document>> {
         let row = sqlx::query(
-            "SELECT * FROM documents WHERE project_id = ? AND key = ? AND deleted_at IS NULL LIMIT 1",
+            "SELECT * FROM documents \
+             WHERE project_id = ? \
+               AND key = ? \
+               AND deleted_at IS NULL \
+               AND (ttl_seconds IS NULL OR strftime('%s','now') < strftime('%s', created_at) + ttl_seconds) \
+             LIMIT 1",
         )
         .bind(project)
         .bind(key)
@@ -158,6 +163,7 @@ impl Storage for SqliteStorage {
             "SELECT d.* FROM documents_fts \
              JOIN documents d ON d.id = documents_fts.document_id \
              WHERE documents_fts MATCH ? AND (? IS NULL OR documents_fts.project_id = ?) AND d.deleted_at IS NULL \
+               AND (d.ttl_seconds IS NULL OR strftime('%s','now') < strftime('%s', d.created_at) + d.ttl_seconds) \
              ORDER BY d.updated_at DESC \
              LIMIT ?",
         )
