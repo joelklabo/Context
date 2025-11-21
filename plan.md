@@ -279,8 +279,8 @@ The CLI already exposes stub variants for these commands; they currently just lo
 - [ ] agents-011: define Claude Code subagents and commands under `.claude/`
       @area(agents) @owner(unassigned) @status(unclaimed)
 
-- [ ] agents-012: define Copilot CLI agents under `.github/agents/`
-      @area(agents) @owner(context-docs-agent) @status(in-progress) @scenario(2025-11-21T06:35:00Z-agents-012)
+- [x] agents-012: define Copilot CLI agents under `.github/agents/`
+      @area(agents) @owner(context-docs-agent) @status(done,commit=d203e79) @scenario(2025-11-21T06:35:00Z-agents-012)
 
 - [ ] agents-013: add a “debug web” agent that explains how to use Dev Web UI + debug bundles
       @area(agents) @owner(unassigned) @status(unclaimed)
