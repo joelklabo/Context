@@ -10,3 +10,11 @@ tracing = "0.1"
 tracing-subscriber = { version = "0.3", features = ["fmt", "env-filter"] }
 context-core = { path = "../context-core" }
 context-agent = { path = "../context-agent" }
+chrono = { version = "0.4", features = ["serde"] }
+serde_json = "1"
+uuid = { version = "1", features = ["v4"] }
+
+[dev-dependencies]
+assert_cmd = "2"
+serde_json = "1"
+tempfile = "3"
