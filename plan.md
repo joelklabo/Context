@@ -195,8 +195,8 @@ Conventions:
 
 ### 4.2 Sync & replication
 
-- [ ] research-002: produce background sync research doc and store via context
-      @area(core) @owner(context-research-agent) @status(in-progress) @scenario(2025-11-21T10:40:00Z-research-002)
+- [x] research-002: produce background sync research doc and store via context
+      @area(core) @owner(context-research-agent) @status(done,commit=1a1283b) @scenario(2025-11-21T10:40:00Z-research-002) @notes(research/background-sync)
 
 - [ ] plan-021: derive background sync implementation plan from research doc and store via context
       @area(core) @owner(unassigned) @status(unclaimed)
@@ -253,7 +253,7 @@ The CLI already exposes stub variants for these commands; they currently just lo
 ## 6. Upcoming work – Web & Dev Web UI
 
 - [ ] web-010: scaffold React + TS + Vite + shadcn web UI in `web-ui/`
-      @area(web) @owner(context-web-agent) @status(in-progress) @scenario(2025-11-21T10:40:00Z-web-010)
+      @area(web) @owner(context-web-agent) @status(in-progress) @scenario(2025-11-21T11:10:00Z-web-010)
 
 - [ ] web-011: serve compiled `web-ui` assets from `context-web` binary
       @area(web) @owner(unassigned) @status(unclaimed)
@@ -296,8 +296,8 @@ The CLI already exposes stub variants for these commands; they currently just lo
 - [x] infra-013: run link checker for README/docs in CI and fail on broken links
       @area(infra) @owner(context-devops-agent) @status(done,commit=ebbfa55) @scenario(2025-11-21T08:02:00Z-infra-013)
 
-- [ ] infra-014: upload test logs/artifacts on CI failure (CLI/core/web) for debugging
-      @area(infra) @owner(context-devops-agent) @status(in-progress) @scenario(2025-11-21T10:40:00Z-infra-014)
+- [x] infra-014: upload test logs/artifacts on CI failure (CLI/core/web) for debugging
+      @area(infra) @owner(context-devops-agent) @status(done,commit=1a1283b) @scenario(2025-11-21T10:40:00Z-infra-014)
 
 - [ ] testing-020: add flaky-test guard (re-run failed tests once, surface list) in CI
       @area(testing) @owner(unassigned) @status(unclaimed)
@@ -321,8 +321,8 @@ The CLI already exposes stub variants for these commands; they currently just lo
 - [x] agents-014: update agent-prompts.txt with push-capable multi-task instructions
       @area(agents) @owner(context-docs-agent) @status(done,commit=a6d01e3) @scenario(2025-11-21T05:25:00Z-agent-prompts)
 
-- [ ] agents-020: add research + planner agent profiles and register in AGENTS.md
-      @area(agents) @owner(context-docs-agent) @status(in-progress) @scenario(2025-11-21T10:40:00Z-agents-020)
+- [x] agents-020: add research + planner agent profiles and register in AGENTS.md
+      @area(agents) @owner(context-docs-agent) @status(done,commit=1a1283b) @scenario(2025-11-21T10:40:00Z-agents-020)
 
 - [x] agents-015: tighten Copilot agent docs (allowed/forbidden) and enforce via plan tests
       @area(agents) @owner(context-docs-agent) @status(done,commit=362e0ba) @scenario(2025-11-21T07:35:00Z-agents-015)
