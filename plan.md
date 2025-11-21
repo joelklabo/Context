@@ -217,7 +217,7 @@ The CLI already exposes stub variants for these commands; they currently just lo
       @area(cli) @owner(context-cli-agent) @status(done,commit=f4a52d7) @scenario(2025-11-21T05:28:05Z-cli-014)
 
 - [ ] cli-016: implement `context web` wrapper around `context-web` server with tests (at least smoke)
-      @area(cli) @owner(unassigned) @status(unclaimed)
+      @area(cli) @owner(context-cli-agent) @status(in-progress) @scenario(2025-11-21T05:35:30Z-cli-016)
 
 - [ ] cli-017: implement `context web-dev` alias/flags for dev web UI
       @area(cli) @owner(unassigned) @status(unclaimed)
@@ -285,8 +285,8 @@ The CLI already exposes stub variants for these commands; they currently just lo
 - [ ] agents-013: add a “debug web” agent that explains how to use Dev Web UI + debug bundles
       @area(agents) @owner(unassigned) @status(unclaimed)
 
-- [ ] agents-014: update agent-prompts.txt with push-capable multi-task instructions
-      @area(agents) @owner(context-docs-agent) @status(in-progress) @scenario(2025-11-21T05:25:00Z-agent-prompts)
+- [x] agents-014: update agent-prompts.txt with push-capable multi-task instructions
+      @area(agents) @owner(context-docs-agent) @status(done,commit=a6d01e3) @scenario(2025-11-21T05:25:00Z-agent-prompts)
 
 - [ ] docs-010: write detailed README with install, Quickstart, agents, TDD rules
       @area(docs) @owner(unassigned) @status(unclaimed)
