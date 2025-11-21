@@ -220,7 +220,7 @@ The CLI already exposes stub variants for these commands; they currently just lo
       @area(cli) @owner(context-cli-agent) @status(done,commit=dc9d31a) @scenario(2025-11-21T05:35:30Z-cli-016)
 
 - [ ] cli-017: implement `context web-dev` alias/flags for dev web UI
-      @area(cli) @owner(unassigned) @status(unclaimed)
+      @area(cli) @owner(context-cli-agent) @status(in-progress) @scenario(2025-11-21T06:21:11Z-cli-017)
 
 - [ ] cli-018: implement `context debug-bundle` to gather logs + traces into an archive
       @area(cli) @owner(unassigned) @status(unclaimed)
@@ -292,4 +292,4 @@ The CLI already exposes stub variants for these commands; they currently just lo
       @area(docs) @owner(context-docs-agent) @status(done,commit=3674eef) @scenario(2025-11-21T06:10:00Z-docs-010)
 
 - [ ] docs-011: add CLAUDE.md / AGENTS.md snippets and keep them in sync via `context agent-doc`
-      @area(docs) @owner(unassigned) @status(unclaimed)
+      @area(docs) @owner(context-docs-agent) @status(in-progress) @scenario(2025-11-21T06:23:00Z-docs-011)

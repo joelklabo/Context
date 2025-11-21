@@ -17,3 +17,21 @@ When working as a Claude agent:
 4. Only commit via `./scripts/runner.sh`.
 
 Do not modify tasks owned by other agents or violate the global rules in `plan.md`.
+
+## Generated agent-doc snippet
+
+Regenerate from the CLI to keep in sync:
+
+```bash
+cargo run -p context-cli -- agent-doc --format markdown > docs/agent-doc.md
+```
+
+Current snippet (copied from `docs/agent-doc.md`):
+
+> # context - Agent Usage (stub)
+>
+> - Use `context find --project <id> --json` to search.
+> - Use `context get --project <id> --key <key> --json` to fetch a doc.
+> - Always prefer `--json` when parsing output as an AI agent.
+>
+> This is a stub; the real content will be generated later.

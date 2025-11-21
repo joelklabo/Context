@@ -24,3 +24,21 @@ This file defines the main agents for the `context` project.
 - `context-docs-agent` – owns README, AGENTS, CLAUDE/agent docs.
 
 Each agent has a dedicated profile in `agents/*.md`.
+
+## Generated agent-doc snippet
+
+Keep this section in sync by running:
+
+```bash
+cargo run -p context-cli -- agent-doc --format markdown > docs/agent-doc.md
+```
+
+Current snippet (copied from `docs/agent-doc.md`):
+
+> # context - Agent Usage (stub)
+>
+> - Use `context find --project <id> --json` to search.
+> - Use `context get --project <id> --key <key> --json` to fetch a doc.
+> - Always prefer `--json` when parsing output as an AI agent.
+>
+> This is a stub; the real content will be generated later.
