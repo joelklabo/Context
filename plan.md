@@ -261,7 +261,7 @@ The CLI already exposes stub variants for these commands; they currently just lo
       @area(obs) @owner(context-devops-agent) @status(done,commit=5ec55523ba67a5234a1009fd0a8a31ce217368fa) @scenario(2025-11-21T04:27:39Z-obs010)
 
 - [ ] obs-011: add scenario_id + project + command fields to all CLI/web logs
-      @area(obs) @owner(unassigned) @status(unclaimed)
+      @area(obs) @owner(context-devops-agent) @status(in-progress) @scenario(2025-11-21T05:03:12Z-obs011)
 
 - [ ] obs-012: implement basic span tracing for major operations (put/get/find/web)
       @area(obs) @owner(unassigned) @status(unclaimed)

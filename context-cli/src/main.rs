@@ -1,6 +1,8 @@
+use std::env;
+
 use anyhow::Result;
 use clap::{Parser, Subcommand};
-use context_telemetry::init_tracing;
+use context_telemetry::{context_span, init_tracing, LogContext};
 
 /// context – CLI entrypoint (skeleton)
 #[derive(Parser)]
@@ -13,6 +15,10 @@ struct Cli {
     /// Output JSON where applicable (for agents)
     #[arg(long, global = true)]
     json: bool,
+
+    /// Optional scenario identifier for correlating logs
+    #[arg(long, global = true)]
+    scenario: Option<String>,
 
     #[command(subcommand)]
     command: Commands,
@@ -128,6 +134,27 @@ enum Commands {
 fn main() -> Result<()> {
     let _telemetry = init_tracing("context-cli", &["context_cli", "context_core"])?;
     let cli = Cli::parse();
+    let command_name = command_name(&cli.command).to_string();
+    let project_label = cli.project.clone().unwrap_or_else(|| "default".to_string());
+    let scenario = cli
+        .scenario
+        .clone()
+        .or_else(|| env::var("CONTEXT_SCENARIO").ok());
+
+    let log_context = LogContext {
+        scenario_id: scenario.as_deref(),
+        project: Some(project_label.as_str()),
+        command: Some(command_name.as_str()),
+    };
+
+    let span = context_span(log_context);
+    let _span_guard = span.enter();
+    tracing::info!(
+        scenario_id = log_context.scenario_id,
+        project = log_context.project,
+        command = log_context.command,
+        "Command start"
+    );
 
     match cli.command {
         Commands::AgentDoc { format } => match format.as_str() {
@@ -144,15 +171,37 @@ fn main() -> Result<()> {
             println!("context init (stub): configuration will be set up here.");
         }
         Commands::Put { key, stdin } => {
-            tracing::info!(?key, ?stdin, "Put command invoked (stub)");
+            tracing::info!(
+                scenario_id = log_context.scenario_id,
+                project = log_context.project,
+                command = log_context.command,
+                ?key,
+                ?stdin,
+                "Put command invoked (stub)"
+            );
             eprintln!("TODO: implement `context put`");
         }
         Commands::Get { key, id, format } => {
-            tracing::info!(?key, ?id, ?format, "Get command invoked (stub)");
+            tracing::info!(
+                scenario_id = log_context.scenario_id,
+                project = log_context.project,
+                command = log_context.command,
+                ?key,
+                ?id,
+                ?format,
+                "Get command invoked (stub)"
+            );
             eprintln!("TODO: implement `context get`");
         }
         Commands::Cat { key, id } => {
-            tracing::info!(?key, ?id, "Cat command invoked (stub)");
+            tracing::info!(
+                scenario_id = log_context.scenario_id,
+                project = log_context.project,
+                command = log_context.command,
+                ?key,
+                ?id,
+                "Cat command invoked (stub)"
+            );
             eprintln!("TODO: implement `context cat`");
         }
         Commands::Find {
@@ -160,38 +209,108 @@ fn main() -> Result<()> {
             limit,
             all_projects,
         } => {
-            tracing::info!(%query, ?limit, ?all_projects, "Find command invoked (stub)");
+            tracing::info!(
+                scenario_id = log_context.scenario_id,
+                project = log_context.project,
+                command = log_context.command,
+                %query,
+                ?limit,
+                ?all_projects,
+                "Find command invoked (stub)"
+            );
             eprintln!("TODO: implement `context find`");
         }
         Commands::Ls {} => {
-            tracing::info!("Ls command invoked (stub)");
+            tracing::info!(
+                scenario_id = log_context.scenario_id,
+                project = log_context.project,
+                command = log_context.command,
+                "Ls command invoked (stub)"
+            );
             eprintln!("TODO: implement `context ls`");
         }
         Commands::Rm { key, id, force } => {
-            tracing::info!(?key, ?id, ?force, "Rm command invoked (stub)");
+            tracing::info!(
+                scenario_id = log_context.scenario_id,
+                project = log_context.project,
+                command = log_context.command,
+                ?key,
+                ?id,
+                ?force,
+                "Rm command invoked (stub)"
+            );
             eprintln!("TODO: implement `context rm`");
         }
         Commands::Gc { dry_run } => {
-            tracing::info!(?dry_run, "Gc command invoked (stub)");
+            tracing::info!(
+                scenario_id = log_context.scenario_id,
+                project = log_context.project,
+                command = log_context.command,
+                ?dry_run,
+                "Gc command invoked (stub)"
+            );
             eprintln!("TODO: implement `context gc`");
         }
         Commands::Web { port } => {
-            tracing::info!(?port, "Web command invoked (stub)");
+            tracing::info!(
+                scenario_id = log_context.scenario_id,
+                project = log_context.project,
+                command = log_context.command,
+                ?port,
+                "Web command invoked (stub)"
+            );
             eprintln!("TODO: implement `context web` wrapper");
         }
         Commands::WebDev { port } => {
-            tracing::info!(?port, "WebDev command invoked (stub)");
+            tracing::info!(
+                scenario_id = log_context.scenario_id,
+                project = log_context.project,
+                command = log_context.command,
+                ?port,
+                "WebDev command invoked (stub)"
+            );
             eprintln!("TODO: implement `context web-dev` wrapper");
         }
         Commands::DebugBundle { scenario, out } => {
-            tracing::info!(?scenario, ?out, "DebugBundle command invoked (stub)");
+            tracing::info!(
+                scenario_id = log_context.scenario_id,
+                project = log_context.project,
+                command = log_context.command,
+                ?scenario,
+                ?out,
+                "DebugBundle command invoked (stub)"
+            );
             eprintln!("TODO: implement `context debug-bundle`");
         }
         Commands::AgentConfig { target } => {
-            tracing::info!(%target, "AgentConfig command invoked (stub)");
+            tracing::info!(
+                scenario_id = log_context.scenario_id,
+                project = log_context.project,
+                command = log_context.command,
+                %target,
+                "AgentConfig command invoked (stub)"
+            );
             eprintln!("TODO: implement `context agent-config`");
         }
     }
 
     Ok(())
+}
+
+fn command_name(command: &Commands) -> &'static str {
+    match command {
+        Commands::AgentDoc { .. } => "agent-doc",
+        Commands::Init => "init",
+        Commands::Put { .. } => "put",
+        Commands::Get { .. } => "get",
+        Commands::Cat { .. } => "cat",
+        Commands::Find { .. } => "find",
+        Commands::Ls {} => "ls",
+        Commands::Rm { .. } => "rm",
+        Commands::Gc { .. } => "gc",
+        Commands::Web { .. } => "web",
+        Commands::WebDev { .. } => "web-dev",
+        Commands::DebugBundle { .. } => "debug-bundle",
+        Commands::AgentConfig { .. } => "agent-config",
+    }
 }

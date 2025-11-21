@@ -10,3 +10,8 @@ tracing = "0.1"
 context-core = { path = "../context-core" }
 context-agent = { path = "../context-agent" }
 context-telemetry = { path = "../context-telemetry" }
+
+[dev-dependencies]
+assert_cmd = "2"
+serde_json = "1"
+tempfile = "3"

@@ -3,7 +3,7 @@ use std::{
     env, fs,
     path::{Path, PathBuf},
 };
-use tracing::Dispatch;
+use tracing::{Dispatch, Span};
 use tracing_subscriber::{fmt, prelude::*, EnvFilter};
 
 const LOG_DIR_ENV: &str = "CONTEXT_LOG_DIR";
@@ -17,6 +17,22 @@ impl TelemetryGuard {
     pub fn log_path(&self) -> &Path {
         &self.log_path
     }
+}
+
+#[derive(Clone, Copy, Debug)]
+pub struct LogContext<'a> {
+    pub scenario_id: Option<&'a str>,
+    pub project: Option<&'a str>,
+    pub command: Option<&'a str>,
+}
+
+pub fn context_span(ctx: LogContext<'_>) -> Span {
+    tracing::info_span!(
+        "context",
+        scenario_id = ctx.scenario_id,
+        project = ctx.project,
+        command = ctx.command
+    )
 }
 
 fn resolve_log_dir() -> Result<PathBuf> {
@@ -62,12 +78,10 @@ fn build_dispatch(
         .json()
         .with_ansi(false)
         .with_writer(file_writer)
-        .with_target(true);
+        .with_target(true)
+        .with_span_list(true);
 
-    let console_layer = fmt::layer()
-        .pretty()
-        .with_writer(console_writer)
-        .with_target(true);
+    let console_layer = fmt::layer().with_writer(console_writer).with_target(true);
 
     let subscriber = tracing_subscriber::registry()
         .with(env_filter)
@@ -138,8 +152,27 @@ mod tests {
         }
     }
 
+    fn strip_ansi(input: &str) -> String {
+        let mut output = String::new();
+        let mut chars = input.chars().peekable();
+
+        while let Some(ch) = chars.next() {
+            if ch == '\u{1b}' && matches!(chars.peek(), Some('[')) {
+                for c in chars.by_ref() {
+                    if c == 'm' || c == 'K' {
+                        break;
+                    }
+                }
+            } else {
+                output.push(ch);
+            }
+        }
+
+        output
+    }
+
     #[test]
-    fn writes_json_logs_to_file() {
+    fn writes_json_logs_to_file_with_context_fields() {
         let temp = tempfile::tempdir().unwrap();
         let writer = TestWriter::default();
 
@@ -152,7 +185,17 @@ mod tests {
         .unwrap();
 
         tracing::dispatcher::with_default(&dispatch, || {
-            tracing::info!("file-log");
+            let ctx = LogContext {
+                scenario_id: Some("scn-123"),
+                project: Some("proj-1"),
+                command: Some("ls"),
+            };
+            tracing::info!(
+                scenario_id = ctx.scenario_id,
+                project = ctx.project,
+                command = ctx.command,
+                "file-log"
+            );
         });
 
         drop(guard);
@@ -164,10 +207,14 @@ mod tests {
 
         assert_eq!(json["fields"]["message"], "file-log");
         assert_eq!(json["level"], "INFO");
+
+        assert_eq!(json["fields"]["scenario_id"], "scn-123");
+        assert_eq!(json["fields"]["project"], "proj-1");
+        assert_eq!(json["fields"]["command"], "ls");
     }
 
     #[test]
-    fn writes_pretty_console_logs() {
+    fn writes_pretty_console_logs_with_context_fields() {
         let temp = tempfile::tempdir().unwrap();
         let writer = TestWriter::default();
 
@@ -180,14 +227,27 @@ mod tests {
         .unwrap();
 
         tracing::dispatcher::with_default(&dispatch, || {
-            tracing::info!("console-log");
+            let ctx = LogContext {
+                scenario_id: Some("scn-234"),
+                project: Some("proj-2"),
+                command: Some("web"),
+            };
+            tracing::info!(
+                scenario_id = ctx.scenario_id,
+                project = ctx.project,
+                command = ctx.command,
+                "console-log"
+            );
         });
 
         drop(guard);
 
-        let output = writer.contents();
+        let output = strip_ansi(&writer.contents());
         assert!(output.contains("console-log"));
         assert!(output.contains("INFO"));
+        assert!(output.contains("scenario_id=\"scn-234\""));
+        assert!(output.contains("project=\"proj-2\""));
+        assert!(output.contains("command=\"web\""));
         assert!(!output.trim_start().starts_with('{'));
     }
 }
