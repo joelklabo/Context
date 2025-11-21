@@ -307,11 +307,18 @@ fn run() -> Result<()> {
                 ?out,
                 "DebugBundle command invoked"
             );
-            let bundle_path = create_debug_bundle(
-                scenario.or_else(|| log_context.scenario_id.map(str::to_string)),
-                out,
-            )?;
-            println!("{}", bundle_path.display());
+            let scenario_value = scenario.or_else(|| log_context.scenario_id.map(str::to_string));
+            let bundle_path = create_debug_bundle(scenario_value.clone(), out)?;
+            if json {
+                let payload = serde_json::json!({
+                    "status": "ok",
+                    "path": bundle_path,
+                    "scenario": scenario_value,
+                });
+                println!("{}", serde_json::to_string_pretty(&payload)?);
+            } else {
+                println!("{}", bundle_path.display());
+            }
         }
         Commands::AgentConfig { target } => {
             tracing::info!(
