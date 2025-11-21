@@ -310,8 +310,8 @@ The CLI already exposes stub variants for these commands; they currently just lo
 - [x] agents-014: update agent-prompts.txt with push-capable multi-task instructions
       @area(agents) @owner(context-docs-agent) @status(done,commit=a6d01e3) @scenario(2025-11-21T05:25:00Z-agent-prompts)
 
-- [ ] agents-015: tighten Copilot agent docs (allowed/forbidden) and enforce via plan tests
-      @area(agents) @owner(context-docs-agent) @status(in-progress) @scenario(2025-11-21T07:35:00Z-agents-015)
+- [x] agents-015: tighten Copilot agent docs (allowed/forbidden) and enforce via plan tests
+      @area(agents) @owner(context-docs-agent) @status(done,commit=362e0ba) @scenario(2025-11-21T07:35:00Z-agents-015)
 
 - [x] docs-010: write detailed README with install, Quickstart, agents, TDD rules
       @area(docs) @owner(context-docs-agent) @status(done,commit=3674eef) @scenario(2025-11-21T06:10:00Z-docs-010)
