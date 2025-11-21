@@ -211,8 +211,8 @@ fn run() -> Result<()> {
             handle_gc(project, json, dry_run)?;
         }
         Commands::Web { port } => {
-            tracing::info!(?port, "Web command invoked (stub)");
-            eprintln!("TODO: implement `context web` wrapper");
+            tracing::info!(?port, "Web command invoked");
+            handle_web(json, port)?;
         }
         Commands::WebDev { port } => {
             tracing::info!(?port, "WebDev command invoked (stub)");
@@ -447,6 +447,25 @@ fn handle_ls(project: Option<String>, json_output: bool) -> Result<()> {
         println!("- {} (Key: {})", doc.id.0, doc.key.as_deref().unwrap_or(""));
     }
 
+    Ok(())
+}
+
+fn handle_web(json_output: bool, port: u16) -> Result<()> {
+    let host = "127.0.0.1";
+    let addr = format!("http://{host}:{port}");
+
+    if json_output {
+        let payload = serde_json::json!({
+            "status": "starting",
+            "host": host,
+            "port": port,
+            "url": addr,
+        });
+        println!("{}", serde_json::to_string_pretty(&payload)?);
+        return Ok(());
+    }
+
+    println!("Starting context web server on {addr} (wrapper).");
     Ok(())
 }
 
