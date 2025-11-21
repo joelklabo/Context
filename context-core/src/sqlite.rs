@@ -1,3 +1,5 @@
+use std::cmp::Ordering;
+
 use chrono::{DateTime, Utc};
 use sqlx::{migrate::Migrator, sqlite::SqliteRow, Row, SqlitePool};
 
@@ -160,11 +162,11 @@ impl Storage for SqliteStorage {
         let limit: i64 = query.limit.map(|l| l as i64).unwrap_or(-1);
 
         let rows = sqlx::query(
-            "SELECT d.* FROM documents_fts \
+            "SELECT d.*, bm25(documents_fts) AS bm25_score FROM documents_fts \
              JOIN documents d ON d.id = documents_fts.document_id \
              WHERE documents_fts MATCH ? AND (? IS NULL OR documents_fts.project_id = ?) AND d.deleted_at IS NULL \
                AND (d.ttl_seconds IS NULL OR strftime('%s','now') < strftime('%s', d.created_at) + d.ttl_seconds) \
-             ORDER BY d.updated_at DESC \
+             ORDER BY bm25_score ASC \
              LIMIT ?",
         )
         .bind(&query.text)
@@ -174,13 +176,41 @@ impl Storage for SqliteStorage {
         .fetch_all(&self.pool)
         .await?;
 
+        let terms: Vec<String> = query
+            .text
+            .split_whitespace()
+            .map(|t| t.to_lowercase())
+            .collect();
+        let now = Utc::now();
+
         let mut hits = Vec::with_capacity(rows.len());
         for row in rows {
+            let bm25_score: f32 = row.try_get("bm25_score")?;
             let doc = Self::deserialize_row(row)?;
+            let text_score = -bm25_score;
+            let recency_score = recency_score(&doc, now);
+            let tag_score = tag_match_bonus(&doc.tags, &terms);
+            let total_score = text_score + recency_score + tag_score;
             hits.push(SearchHit {
                 document: doc,
-                score: 0.0,
+                score: total_score,
             });
+        }
+
+        hits.sort_by(|a, b| {
+            b.score
+                .partial_cmp(&a.score)
+                .unwrap_or(Ordering::Equal)
+                .then_with(|| {
+                    b.document
+                        .updated_at
+                        .partial_cmp(&a.document.updated_at)
+                        .unwrap_or(Ordering::Equal)
+                })
+        });
+
+        if let Some(max) = query.limit {
+            hits.truncate(max);
         }
 
         Ok(hits)
@@ -189,4 +219,21 @@ impl Storage for SqliteStorage {
 
 fn parse_datetime(raw: &str) -> Result<DateTime<Utc>> {
     Ok(DateTime::parse_from_rfc3339(raw)?.with_timezone(&Utc))
+}
+
+fn recency_score(doc: &Document, now: DateTime<Utc>) -> f32 {
+    let age_secs = (now - doc.updated_at).num_seconds().max(0) as f32;
+    1.0 / (1.0 + age_secs / 3600.0)
+}
+
+fn tag_match_bonus(tags: &[String], terms: &[String]) -> f32 {
+    let mut matches = 0;
+    for tag in tags {
+        let tag_lower = tag.to_lowercase();
+        if terms.contains(&tag_lower) {
+            matches += 1;
+        }
+    }
+
+    matches as f32 * 0.5
 }

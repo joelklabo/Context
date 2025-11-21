@@ -134,6 +134,67 @@ async fn search_returns_matches_in_project() -> TestResult<()> {
 }
 
 #[tokio::test]
+async fn search_prefers_recent_documents() -> TestResult<()> {
+    let storage = test_storage().await?;
+
+    let now = Utc::now();
+    let mut older = sample_document("doc-old", "demo", "old", "rust notes");
+    older.created_at = now - chrono::Duration::days(2);
+    older.updated_at = older.created_at;
+
+    let mut newer = sample_document("doc-new", "demo", "new", "rust notes");
+    newer.created_at = now;
+    newer.updated_at = now;
+
+    storage.put(older.clone()).await?;
+    storage.put(newer.clone()).await?;
+
+    let hits = storage
+        .search(SearchQuery {
+            project: Some("demo".to_string()),
+            text: "rust".to_string(),
+            limit: None,
+        })
+        .await?;
+
+    let ids: Vec<_> = hits.iter().map(|h| h.document.id.0.clone()).collect();
+    assert_eq!(ids, vec!["doc-new".to_string(), "doc-old".to_string()]);
+    assert!(hits[0].score > hits[1].score);
+
+    Ok(())
+}
+
+#[tokio::test]
+async fn tag_matches_are_ranked_higher() -> TestResult<()> {
+    let storage = test_storage().await?;
+
+    let mut tagged = sample_document("doc-tagged", "demo", "tagged", "install guide");
+    tagged.tags = vec!["rust".to_string()];
+    tagged.body_markdown = "rust install guide".to_string();
+
+    let mut plain = sample_document("doc-plain", "demo", "plain", "install guide");
+    plain.tags = vec!["misc".to_string()];
+    plain.body_markdown = "rust install guide".to_string();
+
+    storage.put(tagged.clone()).await?;
+    storage.put(plain.clone()).await?;
+
+    let hits = storage
+        .search(SearchQuery {
+            project: Some("demo".to_string()),
+            text: "rust install".to_string(),
+            limit: None,
+        })
+        .await?;
+
+    let ids: Vec<_> = hits.iter().map(|h| h.document.id.0.clone()).collect();
+    assert_eq!(ids, vec!["doc-tagged".to_string(), "doc-plain".to_string()]);
+    assert!(hits[0].score > hits[1].score);
+
+    Ok(())
+}
+
+#[tokio::test]
 async fn ttl_expired_documents_are_filtered_out() -> TestResult<()> {
     let storage = test_storage().await?;
 

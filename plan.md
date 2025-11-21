@@ -188,7 +188,7 @@ Conventions:
       @area(core) @owner(context-core-agent) @status(done,commit=bd29805) @scenario(2025-11-20T20:59:05-08:00)
 
 - [ ] core-013: wire up FTS5 search and ranking by recency and tags
-      @area(core) @owner(unassigned) @status(unclaimed)
+      @area(core) @owner(context-core-agent) @status(in-progress) @scenario(2025-11-20T21:03:29-08:00)
 
 ---
 
@@ -284,6 +284,9 @@ The CLI already exposes stub variants for these commands; they currently just lo
 
 - [ ] agents-013: add a “debug web” agent that explains how to use Dev Web UI + debug bundles
       @area(agents) @owner(unassigned) @status(unclaimed)
+
+- [ ] agents-014: update agent-prompts.txt with push-capable multi-task instructions
+      @area(agents) @owner(context-docs-agent) @status(in-progress) @scenario(2025-11-21T05:25:00Z-agent-prompts)
 
 - [ ] docs-010: write detailed README with install, Quickstart, agents, TDD rules
       @area(docs) @owner(unassigned) @status(unclaimed)
