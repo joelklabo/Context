@@ -187,8 +187,8 @@ Conventions:
 - [x] core-012: add TTL/soft-delete fields and logic; tests for expired/tombstoned docs
       @area(core) @owner(context-core-agent) @status(done,commit=bd29805) @scenario(2025-11-20T20:59:05-08:00)
 
-- [ ] core-013: wire up FTS5 search and ranking by recency and tags
-      @area(core) @owner(context-core-agent) @status(in-progress) @scenario(2025-11-20T21:03:29-08:00)
+- [x] core-013: wire up FTS5 search and ranking by recency and tags
+      @area(core) @owner(context-core-agent) @status(done,commit=36e9ef5) @scenario(2025-11-20T21:03:29-08:00)
 
 ---
 
