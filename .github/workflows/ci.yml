@@ -26,5 +26,11 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-cargo-
       - uses: dtolnay/rust-toolchain@stable
+      - name: Link check (docs + README)
+        uses: lycheeverse/lychee-action@v1.10.1
+        with:
+          args: --verbose --no-progress './**/*.md'
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Run CI via Makefile
         run: make ci

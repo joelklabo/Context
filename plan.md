@@ -279,11 +279,11 @@ The CLI already exposes stub variants for these commands; they currently just lo
 - [x] infra-011: add Linux + macOS CI matrix to catch platform regressions
       @area(infra) @owner(context-devops-agent) @status(done,commit=9bbbc38) @scenario(2025-11-21T07:35:00Z-infra-011)
 
-- [ ] infra-012: add cargo build/test caching in CI keyed by lockfile with safe fallbacks
-      @area(infra) @owner(context-devops-agent) @status(in-progress) @scenario(2025-11-21T07:58:00Z-infra-012)
+- [x] infra-012: add cargo build/test caching in CI keyed by lockfile with safe fallbacks
+      @area(infra) @owner(context-devops-agent) @status(done,commit=34c240e) @scenario(2025-11-21T07:58:00Z-infra-012)
 
 - [ ] infra-013: run link checker for README/docs in CI and fail on broken links
-      @area(infra) @owner(unassigned) @status(unclaimed)
+      @area(infra) @owner(context-devops-agent) @status(in-progress) @scenario(2025-11-21T08:02:00Z-infra-013)
 
 - [ ] infra-014: upload test logs/artifacts on CI failure (CLI/core/web) for debugging
       @area(infra) @owner(unassigned) @status(unclaimed)
