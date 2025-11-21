@@ -182,7 +182,7 @@ Conventions:
       @area(core) @owner(context-core-agent) @status(done,commit=3a6154d) @scenario(2025-11-20T20:27:16-08:00)
 
 - [ ] core-011: implement SQLite-backed `Storage` (put/get/search) with basic tests
-      @area(core) @owner(unassigned) @status(unclaimed)
+      @area(core) @owner(context-core-agent) @status(in-progress) @scenario(2025-11-20T20:49:43-08:00)
 
 - [ ] core-012: add TTL/soft-delete fields and logic; tests for expired/tombstoned docs
       @area(core) @owner(unassigned) @status(unclaimed)
