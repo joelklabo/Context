@@ -253,7 +253,7 @@ The CLI already exposes stub variants for these commands; they currently just lo
 ## 6. Upcoming work – Web & Dev Web UI
 
 - [ ] web-010: scaffold React + TS + Vite + shadcn web UI in `web-ui/`
-      @area(web) @owner(context-web-agent) @status(in-progress) @scenario(2025-11-21T11:10:00Z-web-010)
+      @area(web) @owner(unassigned) @status(unclaimed)
 
 - [ ] web-011: serve compiled `web-ui` assets from `context-web` binary
       @area(web) @owner(unassigned) @status(unclaimed)
@@ -309,8 +309,8 @@ The CLI already exposes stub variants for these commands; they currently just lo
 - [x] agents-010: define Codex CLI agents in `AGENTS.md` using `context agent-doc`
       @area(agents) @owner(context-docs-agent) @status(done,commit=05e2865) @scenario(2025-11-21T12:34:00Z-agents-010)
 
-- [ ] agents-011: define Claude Code subagents and commands under `.claude/`
-      @area(agents) @owner(context-docs-agent) @status(in-progress) @scenario(2026-02-24T13:15:00Z-agents-011)
+- [x] agents-011: define Claude Code subagents and commands under `.claude/`
+      @area(agents) @owner(context-docs-agent) @status(done,commit=d655f29) @scenario(2026-02-24T13:15:00Z-agents-011)
 
 - [x] agents-012: define Copilot CLI agents under `.github/agents/`
       @area(agents) @owner(context-docs-agent) @status(done,commit=d203e79) @scenario(2025-11-21T06:35:00Z-agents-012)
