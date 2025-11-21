@@ -245,8 +245,8 @@ The CLI already exposes stub variants for these commands; they currently just lo
 - [x] cli-020: flesh out `context agent-doc` to generate full agent usage docs
       @area(cli) @owner(context-cli-agent) @status(done,commit=548a200) @scenario(2025-11-21T09:45:00Z-cli-020)
 
-- [ ] cli-021: implement `context project` subcommands (`current`, `set`, `list`) with tests
-      @area(cli) @owner(unassigned) @status(unclaimed)
+- [x] cli-021: implement `context project` subcommands (`current`, `set`, `list`) with tests
+      @area(cli) @owner(context-cli-agent) @status(done,commit=05e2865) @scenario(2026-02-24T12:00:00Z-cli-021)
 
 ---
 
