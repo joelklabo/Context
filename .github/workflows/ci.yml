@@ -27,7 +27,7 @@ jobs:
             ${{ runner.os }}-cargo-
       - uses: dtolnay/rust-toolchain@stable
       - name: Link check (docs + README)
-        uses: lycheeverse/lychee-action@v1.10.1
+        uses: lycheeverse/lychee-action@v2.7.0
         with:
           args: --verbose --no-progress './**/*.md'
         env:
