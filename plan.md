@@ -313,8 +313,8 @@ The CLI already exposes stub variants for these commands; they currently just lo
 - [x] agents-015: tighten Copilot agent docs (allowed/forbidden) and enforce via plan tests
       @area(agents) @owner(context-docs-agent) @status(done,commit=362e0ba) @scenario(2025-11-21T07:35:00Z-agents-015)
 
-- [ ] agents-016: auto-release stale in-progress tasks after 20 minutes via plan-check
-      @area(agents) @owner(context-docs-agent) @status(in-progress) @scenario(2025-11-21T08:50:00Z-agents-016)
+- [x] agents-016: auto-release stale in-progress tasks after 20 minutes via plan-check
+      @area(agents) @owner(context-docs-agent) @status(done,commit=da8c881) @scenario(2025-11-21T08:50:00Z-agents-016)
 
 - [x] docs-010: write detailed README with install, Quickstart, agents, TDD rules
       @area(docs) @owner(context-docs-agent) @status(done,commit=3674eef) @scenario(2025-11-21T06:10:00Z-docs-010)
