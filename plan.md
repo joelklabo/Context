@@ -199,7 +199,7 @@ Conventions:
       @area(core) @owner(context-research-agent) @status(done,commit=1a1283b) @scenario(2025-11-21T10:40:00Z-research-002) @notes(research/background-sync)
 
 - [ ] plan-021: derive background sync implementation plan from research doc and store via context
-      @area(core) @owner(unassigned) @status(unclaimed)
+      @area(core) @owner(context-planner-agent) @status(in-progress) @scenario(2026-02-24T12:30:00Z-plan-021)
 
 - [ ] core-021: implement background sync per plan (storage + CLI sync stub + tests)
       @area(core) @owner(unassigned) @status(unclaimed)
