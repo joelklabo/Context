@@ -263,8 +263,8 @@ The CLI already exposes stub variants for these commands; they currently just lo
 - [x] obs-011: add scenario_id + project + command fields to all CLI/web logs
       @area(obs) @owner(context-devops-agent) @status(done,commit=b994b95466ebb73fda38771ee5bf9f854351574f) @scenario(2025-11-21T05:03:12Z-obs011)
 
-- [ ] obs-012: implement basic span tracing for major operations (put/get/find/web)
-      @area(obs) @owner(context-devops-agent) @status(in-progress) @scenario(2025-11-21T05:16:35Z-obs012)
+- [x] obs-012: implement basic span tracing for major operations (put/get/find/web)
+      @area(obs) @owner(context-devops-agent) @status(done,commit=cac9828ae1fe31e8a59114b9873de9112f1f6d35) @scenario(2025-11-21T05:16:35Z-obs012)
 
 - [ ] obs-013: implement `context debug-bundle` backend (log collection, trace export)
       @area(obs) @owner(unassigned) @status(unclaimed)
