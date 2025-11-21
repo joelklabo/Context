@@ -22,7 +22,7 @@ Your job is to:
 
 0. Prep
 - Read plan.md carefully.
-- Read AGENTS.md or AGENTS.context.md and agents/context-core-agent.md if present to understand your role and restrictions.
+- Read AGENTS.md or AGENTS.md and agents/context-core-agent.md if present to understand your role and restrictions.
 
 1. Create tasks if needed
 - If the feature is not yet broken down:
@@ -133,7 +133,7 @@ Your job:
 
 0. Prep
 - Read plan.md.
-- Read AGENTS.md / AGENTS.context.md and agents/context-cli-agent.md if present to understand constraints.
+- Read AGENTS.md / AGENTS.md and agents/context-cli-agent.md if present to understand constraints.
 
 1. Create tasks if needed
 - If the feature spec is not broken down:
@@ -241,7 +241,7 @@ Your job:
 
 0. Prep
 - Read plan.md.
-- Read AGENTS.md / AGENTS.context.md and agents/context-devops-agent.md if present.
+- Read AGENTS.md / AGENTS.md and agents/context-devops-agent.md if present.
 
 1. Identify tasks
 - In plan.md, list tasks with:

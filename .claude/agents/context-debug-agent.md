@@ -17,7 +17,7 @@ Tracing, logging, scenario IDs, debug bundles, Dev Web UI debugging.
 
 ## Workflow
 
-Follow the global rules in `AGENTS.context.md` and `plan.md`:
+Follow the global rules in `AGENTS.md` and `plan.md`:
 
 1. Pick an unclaimed task in `plan.md` for your area.
 2. Set `@owner(context-debug-agent)` and `@status(in-progress)`.

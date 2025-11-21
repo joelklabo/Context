@@ -5,7 +5,7 @@ Claude Code is used as a multi-agent collaborator on this repo.
 Key files:
 
 - `plan.md` – master task list & workflow rules.
-- `AGENTS.context.md` – global agent definitions and responsibilities.
+- `AGENTS.md` – global agent definitions and responsibilities.
 - `.claude/agents/*.md` – per-agent profiles (core, cli, web, devops, debug, testing, git, docs).
 - `.claude/commands/*.md` – reusable commands (`/context-pick-task`, `/context-debug`, `/context-apply`).
 

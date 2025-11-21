@@ -3,11 +3,11 @@
 This repo is designed for AI coding agents (Codex, Claude Code, Copilot CLI) to collaborate safely.
 
 - Global rules and roles are defined in:
-  - `AGENTS.context.md`
+  - `AGENTS.md`
   - `plan.md`
 
 - Platform-specific agent definitions:
-  - Codex: `AGENTS.context.md` + `agents/*.md`
+  - Codex: `AGENTS.md` + `agents/*.md`
   - Claude Code:
     - `.claude/agents/*.md`
     - `.claude/commands/*.md`
