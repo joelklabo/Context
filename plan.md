@@ -288,8 +288,8 @@ The CLI already exposes stub variants for these commands; they currently just lo
 - [x] agents-014: update agent-prompts.txt with push-capable multi-task instructions
       @area(agents) @owner(context-docs-agent) @status(done,commit=a6d01e3) @scenario(2025-11-21T05:25:00Z-agent-prompts)
 
-- [ ] docs-010: write detailed README with install, Quickstart, agents, TDD rules
-      @area(docs) @owner(context-docs-agent) @status(in-progress) @scenario(2025-11-21T06:10:00Z-docs-010)
+- [x] docs-010: write detailed README with install, Quickstart, agents, TDD rules
+      @area(docs) @owner(context-docs-agent) @status(done,commit=3674eef) @scenario(2025-11-21T06:10:00Z-docs-010)
 
 - [ ] docs-011: add CLAUDE.md / AGENTS.md snippets and keep them in sync via `context agent-doc`
       @area(docs) @owner(unassigned) @status(unclaimed)
