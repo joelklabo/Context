@@ -307,7 +307,7 @@ The CLI already exposes stub variants for these commands; they currently just lo
       @area(infra) @owner(context-devops-agent) @status(done,commit=1a1283b) @scenario(2025-11-21T10:40:00Z-infra-014)
 
 - [x] infra-015: fix lychee link-check action version so CI resolves
-      @area(infra) @owner(context-devops-agent) @status(done,commit=56e6a26) @scenario(2025-11-21T17:01:21Z-lychee)
+      @area(infra) @owner(context-devops-agent) @status(done,commit=4b928c3) @scenario(2025-11-21T17:01:21Z-lychee)
 
 - [ ] testing-020: add flaky-test guard (re-run failed tests once, surface list) in CI
       @area(testing) @owner(unassigned) @status(unclaimed)
