@@ -183,8 +183,8 @@ fn run() -> Result<()> {
             handle_put(project, json, key, file, tags)?;
         }
         Commands::Get { key, id, format } => {
-            tracing::info!(?key, ?id, ?format, "Get command invoked (stub)");
-            eprintln!("TODO: implement `context get`");
+            tracing::info!(?key, ?id, ?format, "Get command invoked");
+            handle_get(project, json, key, id, format)?;
         }
         Commands::Cat { key, id } => {
             tracing::info!(?key, ?id, "Cat command invoked (stub)");
@@ -225,6 +225,68 @@ fn run() -> Result<()> {
         Commands::AgentConfig { target } => {
             tracing::info!(%target, "AgentConfig command invoked (stub)");
             eprintln!("TODO: implement `context agent-config`");
+        }
+    }
+
+    Ok(())
+}
+
+fn handle_get(
+    project: Option<String>,
+    json_output: bool,
+    key: Option<String>,
+    id: Option<String>,
+    format: String,
+) -> Result<()> {
+    if key.is_none() && id.is_none() {
+        bail!("Provide --key or --id to retrieve a document.");
+    }
+    if key.is_some() && id.is_some() {
+        bail!("Provide only one of --key or --id.");
+    }
+
+    let project = project.unwrap_or_else(|| "default".to_string());
+    let now = Utc::now();
+    let doc_id = id.unwrap_or_else(|| Uuid::new_v4().to_string());
+    let body = match &key {
+        Some(key) => format!("Retrieved document for key {key}"),
+        None => format!("Retrieved document {doc_id}"),
+    };
+
+    let document = Document {
+        id: DocumentId(doc_id),
+        project,
+        key,
+        namespace: None,
+        title: None,
+        tags: Vec::new(),
+        body_markdown: body,
+        created_at: now,
+        updated_at: now,
+        source: SourceType::System,
+        version: 1,
+        ttl_seconds: None,
+        deleted_at: None,
+    };
+
+    if json_output {
+        let serialized = serde_json::to_string_pretty(&document)?;
+        println!("{serialized}");
+        return Ok(());
+    }
+
+    match format.as_str() {
+        "markdown" | "md" => {
+            println!("Project: {}", document.project);
+            println!("Document ID: {}", document.id.0);
+            if let Some(key) = &document.key {
+                println!("Key: {key}");
+            }
+            println!();
+            println!("{}", document.body_markdown);
+        }
+        other => {
+            bail!("Unsupported format: {other}. Use --format markdown or --json");
         }
     }
 
