@@ -216,8 +216,8 @@ The CLI already exposes stub variants for these commands; they currently just lo
 - [x] cli-015: implement `context rm` (soft delete) + `context gc` (hard delete/vacuum) with tests
       @area(cli) @owner(context-cli-agent) @status(done,commit=f4a52d7) @scenario(2025-11-21T05:28:05Z-cli-014)
 
-- [ ] cli-016: implement `context web` wrapper around `context-web` server with tests (at least smoke)
-      @area(cli) @owner(context-cli-agent) @status(in-progress) @scenario(2025-11-21T05:35:30Z-cli-016)
+- [x] cli-016: implement `context web` wrapper around `context-web` server with tests (at least smoke)
+      @area(cli) @owner(context-cli-agent) @status(done,commit=dc9d31a) @scenario(2025-11-21T05:35:30Z-cli-016)
 
 - [ ] cli-017: implement `context web-dev` alias/flags for dev web UI
       @area(cli) @owner(unassigned) @status(unclaimed)
@@ -289,7 +289,7 @@ The CLI already exposes stub variants for these commands; they currently just lo
       @area(agents) @owner(context-docs-agent) @status(done,commit=a6d01e3) @scenario(2025-11-21T05:25:00Z-agent-prompts)
 
 - [ ] docs-010: write detailed README with install, Quickstart, agents, TDD rules
-      @area(docs) @owner(unassigned) @status(unclaimed)
+      @area(docs) @owner(context-docs-agent) @status(in-progress) @scenario(2025-11-21T06:10:00Z-docs-010)
 
 - [ ] docs-011: add CLAUDE.md / AGENTS.md snippets and keep them in sync via `context agent-doc`
       @area(docs) @owner(unassigned) @status(unclaimed)
