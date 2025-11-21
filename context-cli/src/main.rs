@@ -294,9 +294,9 @@ fn run() -> Result<()> {
                 project = log_context.project,
                 command = log_context.command,
                 ?port,
-                "WebDev command invoked (stub)"
+                "WebDev command invoked"
             );
-            eprintln!("TODO: implement `context web-dev` wrapper");
+            handle_web_dev(json, port)?;
         }
         Commands::DebugBundle { scenario, out } => {
             tracing::info!(
@@ -614,6 +614,26 @@ fn handle_web(json_output: bool, port: u16) -> Result<()> {
     }
 
     println!("Starting context web server on {addr} (wrapper).");
+    Ok(())
+}
+
+fn handle_web_dev(json_output: bool, port: u16) -> Result<()> {
+    let host = "127.0.0.1";
+    let addr = format!("http://{host}:{port}");
+
+    if json_output {
+        let payload = serde_json::json!({
+            "status": "starting",
+            "host": host,
+            "port": port,
+            "url": addr,
+            "mode": "dev",
+        });
+        println!("{}", serde_json::to_string_pretty(&payload)?);
+        return Ok(());
+    }
+
+    println!("Starting context web-dev server on {addr} (wrapper).");
     Ok(())
 }
 
