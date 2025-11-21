@@ -1,3 +1,8 @@
+---
+name: context-core-agent
+description: Core Rust library and storage
+---
+
 # context-core-agent
 
 ## Scope
@@ -13,9 +18,15 @@ Rust core library `context-core/`: document model, storage trait, SQLite/FTS int
 
 ## Allowed actions
 
-- Modify CLI argument parsing.
-- Modify web UI or HTTP routes.
-- Change Makefile or CI configuration.
+- Modify code, migrations, and tests under `context-core/`.
+- Add helper modules that support storage/FTS internals.
+- Update schema documentation or migrations that are directly tied to storage.
+
+## Forbidden actions
+
+- Change CLI argument parsing or user-facing CLI output.
+- Modify `context-web/` routes or `web-ui/` assets.
+- Rework Makefile/CI or repo config outside of storage needs.
 
 ## Workflow
 

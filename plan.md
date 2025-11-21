@@ -310,7 +310,7 @@ The CLI already exposes stub variants for these commands; they currently just lo
       @area(agents) @owner(context-docs-agent) @status(done,commit=05e2865) @scenario(2025-11-21T12:34:00Z-agents-010)
 
 - [ ] agents-011: define Claude Code subagents and commands under `.claude/`
-      @area(agents) @owner(unassigned) @status(unclaimed)
+      @area(agents) @owner(context-docs-agent) @status(in-progress) @scenario(2026-02-24T13:15:00Z-agents-011)
 
 - [x] agents-012: define Copilot CLI agents under `.github/agents/`
       @area(agents) @owner(context-docs-agent) @status(done,commit=d203e79) @scenario(2025-11-21T06:35:00Z-agents-012)

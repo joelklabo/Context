@@ -1,3 +1,8 @@
+---
+name: context-docs-agent
+description: Documentation and usage guides
+---
+
 # context-docs-agent
 
 ## Scope
@@ -11,7 +16,14 @@ Documentation: README, AGENTS files, CLAUDE.md, usage guides.
 
 ## Allowed actions
 
-- Modify core code except for doc-comments.
+- Update README, AGENTS docs, CLAUDE.md, and usage guides.
+- Regenerate docs using `context agent-doc` when behavior changes.
+- Adjust doc comments to keep docs accurate.
+
+## Forbidden actions
+
+- Modify product code behavior outside of documentation clarity.
+- Change `plan.md` tasks outside of docs-related edits.
 
 ## Workflow
 
