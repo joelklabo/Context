@@ -210,8 +210,8 @@ The CLI already exposes stub variants for these commands; they currently just lo
 - [x] cli-013: implement `context find` (search API, JSON output) with tests
       @area(cli) @owner(context-cli-agent) @status(done,commit=f5e8815) @scenario(2025-11-21T05:24:02Z-cli-013)
 
-- [ ] cli-014: implement `context ls` (list docs) with tests
-      @area(cli) @owner(context-cli-agent) @status(in-progress) @scenario(2025-11-21T05:28:05Z-cli-014)
+- [x] cli-014: implement `context ls` (list docs) with tests
+      @area(cli) @owner(context-cli-agent) @status(done,commit=ab5ebe5) @scenario(2025-11-21T05:28:05Z-cli-014)
 
 - [ ] cli-015: implement `context rm` (soft delete) + `context gc` (hard delete/vacuum) with tests
       @area(cli) @owner(unassigned) @status(unclaimed)
