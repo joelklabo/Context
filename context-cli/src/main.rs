@@ -4,13 +4,10 @@ use std::{
     path::{Path, PathBuf},
 };
 
-use anyhow::{anyhow, bail, Context, Result};
+use anyhow::{bail, Context, Result};
 use chrono::Utc;
 use clap::{Parser, Subcommand};
-use context_core::{
-    sync::{self, SyncConfig},
-    Document, DocumentId, SourceType,
-};
+use context_core::{Document, DocumentId, SourceType};
 use context_telemetry::{context_span, init_tracing, LogContext};
 use serde::{Deserialize, Serialize};
 use tracing::Span;
@@ -133,12 +130,6 @@ enum Commands {
         port: u16,
     },
 
-    /// Synchronize the local database with a filesystem remote
-    Sync {
-        #[command(subcommand)]
-        action: SyncCommands,
-    },
-
     /// Create a debug bundle
     DebugBundle {
         #[arg(long)]
@@ -172,36 +163,6 @@ enum ProjectCommands {
     },
     /// List known projects
     List,
-}
-
-#[derive(Subcommand)]
-enum SyncCommands {
-    /// Show sync status between local and remote
-    Status {
-        /// Override remote path (defaults to CONTEXT_SYNC_REMOTE or $CONTEXT_HOME/sync-remote)
-        #[arg(long)]
-        remote: Option<PathBuf>,
-    },
-    /// Push local database to remote
-    Push {
-        /// Override remote path (defaults to CONTEXT_SYNC_REMOTE or $CONTEXT_HOME/sync-remote)
-        #[arg(long)]
-        remote: Option<PathBuf>,
-
-        /// Overwrite remote even if diverged
-        #[arg(long)]
-        force: bool,
-    },
-    /// Pull remote database into local
-    Pull {
-        /// Override remote path (defaults to CONTEXT_SYNC_REMOTE or $CONTEXT_HOME/sync-remote)
-        #[arg(long)]
-        remote: Option<PathBuf>,
-
-        /// Overwrite local even if diverged
-        #[arg(long)]
-        force: bool,
-    },
 }
 
 fn main() {
@@ -357,19 +318,6 @@ fn run() -> Result<()> {
                 "WebDev command invoked"
             );
             handle_web_dev(json, port)?;
-        }
-        Commands::Sync { action } => {
-            tracing::info!(
-                scenario_id = log_context.scenario_id,
-                project = log_context.project,
-                command = log_context.command,
-                "Sync command invoked"
-            );
-            match action {
-                SyncCommands::Status { remote } => handle_sync_status(json, remote)?,
-                SyncCommands::Push { remote, force } => handle_sync_push(json, remote, force)?,
-                SyncCommands::Pull { remote, force } => handle_sync_pull(json, remote, force)?,
-            }
         }
         Commands::DebugBundle { scenario, out } => {
             tracing::info!(
@@ -732,86 +680,6 @@ fn handle_web_dev(json_output: bool, port: u16) -> Result<()> {
     Ok(())
 }
 
-fn handle_sync_status(json_output: bool, remote: Option<PathBuf>) -> Result<()> {
-    let cfg = sync_config(remote)?;
-    let status = sync::status(&cfg)?;
-
-    if json_output {
-        println!("{}", serde_json::to_string_pretty(&status)?);
-        return Ok(());
-    }
-
-    let hash = status
-        .local
-        .as_ref()
-        .map(|m| m.db_hash.as_str())
-        .unwrap_or("<none>");
-
-    match status.state {
-        sync::SyncState::InSync => println!("Local and remote are in sync (hash {}).", hash),
-        sync::SyncState::Ahead => println!("Local is ahead of remote (push recommended)."),
-        sync::SyncState::Behind => println!("Remote is ahead of local (pull recommended)."),
-        sync::SyncState::Diverged => {
-            println!("Local and remote have diverged; resolve with --force push/pull.")
-        }
-        sync::SyncState::Unknown => println!("No sync metadata yet; try push to initialize."),
-    }
-
-    Ok(())
-}
-
-fn handle_sync_push(json_output: bool, remote: Option<PathBuf>, force: bool) -> Result<()> {
-    let cfg = sync_config(remote)?;
-    let result = sync::push(&cfg, force)
-        .with_context(|| format!("Failed to push to {}", cfg.remote.display()))?;
-
-    if json_output {
-        println!("{}", serde_json::to_string_pretty(&result)?);
-        return Ok(());
-    }
-
-    println!(
-        "Pushed db.sqlite to {} (gen {}, bytes {}, hash {}).",
-        cfg.remote.display(),
-        result.generation,
-        result.db_bytes,
-        result.db_hash
-    );
-    Ok(())
-}
-
-fn handle_sync_pull(json_output: bool, remote: Option<PathBuf>, force: bool) -> Result<()> {
-    let cfg = sync_config(remote)?;
-    let result = match sync::pull(&cfg, force) {
-        Ok(res) => res,
-        Err(err) => {
-            let mut msg = err.to_string();
-            if !force && !msg.to_lowercase().contains("force") {
-                msg.push_str("; rerun with --force to overwrite");
-            }
-            return Err(anyhow!(
-                "Failed to pull from {}: {}",
-                cfg.remote.display(),
-                msg
-            ));
-        }
-    };
-
-    if json_output {
-        println!("{}", serde_json::to_string_pretty(&result)?);
-        return Ok(());
-    }
-
-    println!(
-        "Pulled db.sqlite from {} (gen {}, bytes {}, hash {}).",
-        cfg.remote.display(),
-        result.generation,
-        result.db_bytes,
-        result.db_hash
-    );
-    Ok(())
-}
-
 fn handle_rm(
     project: Option<String>,
     json_output: bool,
@@ -1039,7 +907,6 @@ fn command_name(command: &Commands) -> &'static str {
         Commands::Gc { .. } => "gc",
         Commands::Web { .. } => "web",
         Commands::WebDev { .. } => "web-dev",
-        Commands::Sync { .. } => "sync",
         Commands::DebugBundle { .. } => "debug-bundle",
         Commands::AgentConfig { .. } => "agent-config",
         Commands::Project { .. } => "project",
@@ -1098,12 +965,6 @@ fn command_span(log_context: LogContext<'_>, command: &Commands) -> Span {
         ),
         Commands::Gc { .. } => tracing::info_span!(
             "cli.gc",
-            scenario_id = log_context.scenario_id,
-            project = log_context.project,
-            command = log_context.command
-        ),
-        Commands::Sync { .. } => tracing::info_span!(
-            "cli.sync",
             scenario_id = log_context.scenario_id,
             project = log_context.project,
             command = log_context.command
@@ -1187,37 +1048,6 @@ fn create_debug_bundle(scenario: Option<String>, out: Option<String>) -> Result<
 
     writer.finish()?;
     Ok(bundle_path)
-}
-
-fn sync_config(remote_override: Option<PathBuf>) -> Result<SyncConfig> {
-    let home = context_home()?;
-    fs::create_dir_all(&home)?;
-    let remote = resolve_remote(remote_override, &home)?;
-    Ok(SyncConfig {
-        local_db: home.join("db.sqlite"),
-        local_meta: home.join("sync-meta.json"),
-        remote,
-    })
-}
-
-fn resolve_remote(remote_override: Option<PathBuf>, home: &Path) -> Result<PathBuf> {
-    if let Some(remote) = remote_override {
-        return absolutize(remote);
-    }
-
-    if let Ok(env_remote) = env::var("CONTEXT_SYNC_REMOTE") {
-        return absolutize(PathBuf::from(env_remote));
-    }
-
-    Ok(home.join("sync-remote"))
-}
-
-fn absolutize(path: PathBuf) -> Result<PathBuf> {
-    if path.is_absolute() {
-        return Ok(path);
-    }
-    let cwd = env::current_dir()?;
-    Ok(cwd.join(path))
 }
 
 fn context_home() -> Result<PathBuf> {
