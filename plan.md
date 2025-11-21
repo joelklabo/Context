@@ -201,8 +201,8 @@ Conventions:
 - [x] plan-021: derive background sync implementation plan from research doc and store via context
       @area(core) @owner(context-planner-agent) @status(done,commit=05dc28c) @scenario(2026-02-24T12:30:00Z-plan-021)
 
-- [ ] core-021: implement background sync per plan (storage + CLI sync stub + tests)
-      @area(core) @owner(context-core-agent) @status(in-progress) @scenario(2026-02-24T13:30:00Z-core-021)
+- [x] core-021: implement background sync per plan (storage + CLI sync stub + tests)
+      @area(core) @owner(context-core-agent) @status(done,commit=0161662) @scenario(2026-02-24T13:30:00Z-core-021)
 
 - [ ] core-022: remove accidental sync prototype files from core/cli
       @area(core) @owner(unassigned) @status(unclaimed)
