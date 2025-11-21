@@ -226,7 +226,7 @@ The CLI already exposes stub variants for these commands; they currently just lo
       @area(cli) @owner(context-cli-agent) @status(done,commit=943466e) @scenario(2025-11-21T06:32:00Z-cli-018)
 
 - [ ] cli-019: implement `context agent-config` to emit Codex/Claude/Copilot agent configs
-      @area(cli) @owner(unassigned) @status(unclaimed)
+      @area(cli) @owner(context-cli-agent) @status(in-progress) @scenario(2025-11-21T06:48:23Z-cli-019)
 
 - [ ] cli-020: flesh out `context agent-doc` to generate full agent usage docs
       @area(cli) @owner(unassigned) @status(unclaimed)
@@ -239,7 +239,7 @@ The CLI already exposes stub variants for these commands; they currently just lo
 ## 6. Upcoming work – Web & Dev Web UI
 
 - [ ] web-010: scaffold React + TS + Vite + shadcn web UI in `web-ui/`
-      @area(web) @owner(unassigned) @status(unclaimed)
+      @area(web) @owner(context-web-agent) @status(in-progress) @scenario(2025-11-21T06:30:00Z-web-010)
 
 - [ ] web-011: serve compiled `web-ui` assets from `context-web` binary
       @area(web) @owner(unassigned) @status(unclaimed)
@@ -280,7 +280,7 @@ The CLI already exposes stub variants for these commands; they currently just lo
       @area(agents) @owner(unassigned) @status(unclaimed)
 
 - [ ] agents-012: define Copilot CLI agents under `.github/agents/`
-      @area(agents) @owner(unassigned) @status(unclaimed)
+      @area(agents) @owner(context-docs-agent) @status(in-progress) @scenario(2025-11-21T06:35:00Z-agents-012)
 
 - [ ] agents-013: add a “debug web” agent that explains how to use Dev Web UI + debug bundles
       @area(agents) @owner(unassigned) @status(unclaimed)

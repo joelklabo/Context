@@ -17,9 +17,9 @@ CLI binary `context-cli/`: subcommands, flags, JSON output, exit codes.
 
 ## Allowed actions
 
-- Modify DB schema.
-- Modify web UI.
-- Change core storage semantics.
+- Modify code and tests under `context-cli/` (including adding helper modules).
+- Add CLI integration tests that invoke the compiled binary.
+- Tweak CLI-facing docs/snippets when directly tied to a CLI change.
 
 ## Workflow
 
@@ -31,3 +31,8 @@ Follow the global rules in `AGENTS.context.md` and `plan.md`:
 4. Run `make ci`.
 5. Commit using `./scripts/runner.sh "<id>: <short message> [agent:context-cli-agent]"`.
 6. Update `plan.md` to mark the task done with `@status(done,commit=<hash>)`.
+
+Do NOT:
+- Modify core storage behavior or schema.
+- Touch `context-web/`, `web-ui/`, Makefile, or CI workflows.
+- Edit another agent’s in-progress task in `plan.md`.
