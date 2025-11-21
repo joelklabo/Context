@@ -1,6 +1,6 @@
 use anyhow::Result;
 use clap::{Parser, Subcommand};
-use tracing_subscriber::EnvFilter;
+use context_telemetry::init_tracing;
 
 /// context – CLI entrypoint (skeleton)
 #[derive(Parser)]
@@ -125,18 +125,8 @@ enum Commands {
     },
 }
 
-fn init_tracing() {
-    let filter = EnvFilter::from_default_env()
-        .add_directive("context_cli=info".parse().unwrap())
-        .add_directive("context_core=info".parse().unwrap());
-    tracing_subscriber::fmt()
-        .with_env_filter(filter)
-        .with_target(false)
-        .init();
-}
-
 fn main() -> Result<()> {
-    init_tracing();
+    let _telemetry = init_tracing("context-cli", &["context_cli", "context_core"])?;
     let cli = Cli::parse();
 
     match cli.command {

@@ -45,6 +45,7 @@ web-ui/pnpm-lock.yaml
 .context/traces/
 .context/cache/
 .context/tmp/
+logs/
 
 # context-home override
 CONTEXT_HOME/

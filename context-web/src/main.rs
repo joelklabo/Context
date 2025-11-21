@@ -1,7 +1,8 @@
+use anyhow::Result;
 use axum::{routing::get, Router};
+use context_telemetry::init_tracing;
 use std::net::SocketAddr;
 use tokio::net::TcpListener;
-use tracing_subscriber::EnvFilter;
 
 async fn health() -> &'static str {
     "OK"
@@ -12,12 +13,8 @@ async fn agent_doc() -> String {
 }
 
 #[tokio::main]
-async fn main() {
-    let filter = EnvFilter::from_default_env().add_directive("context_web=info".parse().unwrap());
-    tracing_subscriber::fmt()
-        .with_env_filter(filter)
-        .with_target(false)
-        .init();
+async fn main() -> Result<()> {
+    let _telemetry = init_tracing("context-web", &["context_web"])?;
 
     let app = Router::new()
         .route("/healthz", get(health))
@@ -25,8 +22,8 @@ async fn main() {
 
     let addr = SocketAddr::from(([127, 0, 0, 1], 8077));
     tracing::info!("Starting context-web on http://{addr}");
-    let listener = TcpListener::bind(addr).await.unwrap();
-    axum::serve(listener, app.into_make_service())
-        .await
-        .unwrap();
+    let listener = TcpListener::bind(addr).await?;
+    axum::serve(listener, app.into_make_service()).await?;
+
+    Ok(())
 }

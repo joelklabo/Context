@@ -7,6 +7,6 @@ edition = "2021"
 anyhow = "1"
 clap = { version = "4", features = ["derive"] }
 tracing = "0.1"
-tracing-subscriber = { version = "0.3", features = ["fmt", "env-filter"] }
 context-core = { path = "../context-core" }
 context-agent = { path = "../context-agent" }
+context-telemetry = { path = "../context-telemetry" }
