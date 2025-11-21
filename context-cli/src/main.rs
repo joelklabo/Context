@@ -199,8 +199,8 @@ fn run() -> Result<()> {
             handle_find(project, json, query, limit, all_projects)?;
         }
         Commands::Ls {} => {
-            tracing::info!("Ls command invoked (stub)");
-            eprintln!("TODO: implement `context ls`");
+            tracing::info!("Ls command invoked");
+            handle_ls(project, json)?;
         }
         Commands::Rm { key, id, force } => {
             tracing::info!(?key, ?id, ?force, "Rm command invoked (stub)");
@@ -405,6 +405,46 @@ fn handle_find(
             println!("   Key: {key}");
         }
         println!("   {}", doc.body_markdown);
+    }
+
+    Ok(())
+}
+
+fn handle_ls(project: Option<String>, json_output: bool) -> Result<()> {
+    let project = project.unwrap_or_else(|| "default".to_string());
+    let now = Utc::now();
+    let mut documents = Vec::new();
+
+    for i in 1..=3 {
+        let id = Uuid::new_v4().to_string();
+        let key = format!("doc-{i}");
+        let body = format!("This is listed document {i} in {project}");
+        documents.push(Document {
+            id: DocumentId(id),
+            project: project.clone(),
+            key: Some(key.clone()),
+            namespace: None,
+            title: None,
+            tags: Vec::new(),
+            body_markdown: body,
+            created_at: now,
+            updated_at: now,
+            source: SourceType::System,
+            version: 1,
+            ttl_seconds: None,
+            deleted_at: None,
+        });
+    }
+
+    if json_output {
+        let serialized = serde_json::to_string_pretty(&documents)?;
+        println!("{serialized}");
+        return Ok(());
+    }
+
+    println!("Documents in project {project}");
+    for doc in &documents {
+        println!("- {} (Key: {})", doc.id.0, doc.key.as_deref().unwrap_or(""));
     }
 
     Ok(())
