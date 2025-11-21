@@ -181,8 +181,8 @@ Conventions:
 - [x] core-010: design SQLite schema and migrations for projects, documents, versions, FTS5 index
       @area(core) @owner(context-core-agent) @status(done,commit=3a6154d) @scenario(2025-11-20T20:27:16-08:00)
 
-- [ ] core-011: implement SQLite-backed `Storage` (put/get/search) with basic tests
-      @area(core) @owner(context-core-agent) @status(in-progress) @scenario(2025-11-20T20:49:43-08:00)
+- [x] core-011: implement SQLite-backed `Storage` (put/get/search) with basic tests
+      @area(core) @owner(context-core-agent) @status(done,commit=74ae9c3) @scenario(2025-11-20T20:49:43-08:00)
 
 - [ ] core-012: add TTL/soft-delete fields and logic; tests for expired/tombstoned docs
       @area(core) @owner(unassigned) @status(unclaimed)
