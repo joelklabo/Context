@@ -204,8 +204,8 @@ The CLI already exposes stub variants for these commands; they currently just lo
 - [x] cli-011: implement `context get` (key/id, project, format) with tests
       @area(cli) @owner(context-cli-agent) @status(done,commit=0277f68) @scenario(2025-11-21T05:16:09Z-cli-011)
 
-- [ ] cli-012: implement `context cat` (content-only output for agents) with tests
-      @area(cli) @owner(context-cli-agent) @status(in-progress) @scenario(2025-11-21T05:19:59Z-cli-012)
+- [x] cli-012: implement `context cat` (content-only output for agents) with tests
+      @area(cli) @owner(context-cli-agent) @status(done,commit=bc80744) @scenario(2025-11-21T05:19:59Z-cli-012)
 
 - [ ] cli-013: implement `context find` (search API, JSON output) with tests
       @area(cli) @owner(unassigned) @status(unclaimed)
