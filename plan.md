@@ -46,6 +46,10 @@
    - Prefer multiple small commits that each keep tests green.
    - Avoid huge, multi‑feature commits that are hard to revert.
 
+9. **Auto-claim the topmost eligible task, then loop.**
+   - After reading PLAN.md, immediately claim the first unclaimed task that matches your agent’s scope before running tests or writing code. Set `@owner(<agent>)`, `@status(in-progress)`, and `@scenario(<timestamp-rand>)`.
+   - When you finish a task, mark it done, then restart at the top to claim the next eligible unclaimed task without waiting for extra approval. Stop only if no tasks match your scope.
+
 ---
 
 ## 1. Task line format
@@ -87,7 +91,7 @@ Conventions:
 **Every agent must follow this exact cycle:**
 
 1. **Pick a task**
-   - Choose a `- [ ]` task with `@status(unclaimed)`.
+   - Start at the top of this file and choose the first `- [ ]` task with `@status(unclaimed)` that matches your agent scope.
    - Do not pick more than **one** task at a time.
 
 2. **Claim it**
@@ -338,3 +342,6 @@ The CLI already exposes stub variants for these commands; they currently just lo
 
 - [x] docs-011: add CLAUDE.md / AGENTS.md snippets and keep them in sync via `context agent-doc`
       @area(docs) @owner(context-docs-agent) @status(done,commit=ba14617) @scenario(2025-11-21T06:23:00Z-docs-011)
+
+- [ ] plan-022: add auto-claim workflow rules and loop guidance to PLAN.md
+      @area(docs) @owner(context-docs-agent) @status(in-progress) @scenario(2025-11-21T16:49:30Z-auto-claim)
