@@ -1,0 +1,9 @@
+[workspace]
+members = [
+    "context-core",
+    "context-cli",
+    "context-agent",
+    "context-web",
+    "context-plan",
+]
+resolver = "2"

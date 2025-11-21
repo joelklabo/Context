@@ -1,0 +1,137 @@
+# ------------------------------
+# Rust / Cargo
+# ------------------------------
+
+/target/
+/**/target/
+
+# Cargo build artifacts
+debug/
+release/
+
+# Rust incremental build
+**/*.rs.bk
+
+# Rust coverage / instrumentation
+coverage/
+llvm-profile-data/
+*.profraw
+*.profdata
+*.gcda
+*.gcno
+
+# ------------------------------
+# Node / Web UI (when added)
+# ------------------------------
+
+web-ui/node_modules/
+web-ui/.turbo/
+web-ui/.parcel-cache/
+web-ui/dist/
+/dist/
+/build/
+
+# lock files (optional: allow one)
+web-ui/package-lock.json
+web-ui/yarn.lock
+web-ui/pnpm-lock.yaml
+
+# ------------------------------
+# Logs, traces, debug bundles
+# ------------------------------
+
+# Local runtime logs
+.context/logs/
+.context/traces/
+.context/cache/
+.context/tmp/
+
+# context-home override
+CONTEXT_HOME/
+
+# Debug bundles (zip/tar files)
+*.zip
+*.tar.gz
+debug-*.zip
+debug-*.tar.gz
+debug/
+
+# CLI debugging artifacts
+*.log
+*.trace
+*.jsonl
+
+# ------------------------------
+# Local database files
+# ------------------------------
+
+# SQLite DB (users can regenerate; agents shouldn’t commit these)
+context.db
+*.sqlite
+*.sqlite3
+*.db
+
+# Write-ahead logs
+*.sqlite-wal
+*.sqlite-shm
+
+# ------------------------------
+# System / Editor junk
+# ------------------------------
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# VSCode
+.vscode/*.log
+.vscode/ipch/
+.vscode/.cache/
+
+# Vim / Neovim / Emacs
+*.swp
+*.swo
+*~
+*.un~
+
+# JetBrains
+.idea/
+
+# ------------------------------
+# Git / Agents / Runner
+# ------------------------------
+
+# Runner lock file
+.git/context-runner.lock
+
+# GitHub Copilot temp
+.github/copilot-templates/
+
+# Claude subagent temp
+.claude/sessions/
+
+# Codex CLI internal caches
+.codex/*
+
+# ------------------------------
+# Build / Release artifacts
+# ------------------------------
+
+# Release binaries
+context
+context.exe
+context-macos*
+context-linux*
+context-win*
+
+# Homebrew build cache
+formula/
+
+# ------------------------------
+# Test / fixtures
+# ------------------------------
+
+# Tests that create temp dirs
+tmp/
+tests/tmp/
