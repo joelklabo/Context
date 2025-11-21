@@ -274,6 +274,25 @@ The CLI already exposes stub variants for these commands; they currently just lo
 
 ---
 
+## 8.5 CI hardening
+
+- [ ] infra-011: add Linux + macOS CI matrix to catch platform regressions
+      @area(infra) @owner(context-devops-agent) @status(in-progress) @scenario(2025-11-21T07:35:00Z-infra-011)
+
+- [ ] infra-012: add cargo build/test caching in CI keyed by lockfile with safe fallbacks
+      @area(infra) @owner(unassigned) @status(unclaimed)
+
+- [ ] infra-013: run link checker for README/docs in CI and fail on broken links
+      @area(infra) @owner(unassigned) @status(unclaimed)
+
+- [ ] infra-014: upload test logs/artifacts on CI failure (CLI/core/web) for debugging
+      @area(infra) @owner(unassigned) @status(unclaimed)
+
+- [ ] testing-020: add flaky-test guard (re-run failed tests once, surface list) in CI
+      @area(testing) @owner(unassigned) @status(unclaimed)
+
+---
+
 ## 8. Upcoming work – Agents & docs
 
 - [ ] agents-010: define Codex CLI agents in `AGENTS.context.md` using `context agent-doc`
@@ -290,6 +309,9 @@ The CLI already exposes stub variants for these commands; they currently just lo
 
 - [x] agents-014: update agent-prompts.txt with push-capable multi-task instructions
       @area(agents) @owner(context-docs-agent) @status(done,commit=a6d01e3) @scenario(2025-11-21T05:25:00Z-agent-prompts)
+
+- [ ] agents-015: tighten Copilot agent docs (allowed/forbidden) and enforce via plan tests
+      @area(agents) @owner(context-docs-agent) @status(in-progress) @scenario(2025-11-21T07:35:00Z-agents-015)
 
 - [x] docs-010: write detailed README with install, Quickstart, agents, TDD rules
       @area(docs) @owner(context-docs-agent) @status(done,commit=3674eef) @scenario(2025-11-21T06:10:00Z-docs-010)

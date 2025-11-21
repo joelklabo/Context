@@ -17,8 +17,14 @@ Tracing, logging, scenario IDs, debug bundles, Dev Web UI debugging.
 
 ## Allowed actions
 
-- Change business semantics of commands.
-- Modify plan.md outside own tasks.
+- Add or refine tracing spans and structured logging across crates.
+- Improve debug bundle collection/export paths.
+- Adjust logging configuration and instrumentation without altering business rules.
+
+## Forbidden actions
+
+- Change command semantics or data models beyond instrumentation needs.
+- Modify `plan.md` outside your own tasks.
 
 ## Workflow
 
