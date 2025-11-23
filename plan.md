@@ -346,5 +346,8 @@ The CLI already exposes stub variants for these commands; they currently just lo
 - [x] docs-011: add CLAUDE.md / AGENTS.md snippets and keep them in sync via `context agent-doc`
       @area(docs) @owner(context-docs-agent) @status(done,commit=ba14617) @scenario(2025-11-21T06:23:00Z-docs-011)
 
+- [x] docs-012: capture user stories and entrypoints for CLI + web journeys
+      @area(docs) @owner(context-docs-agent) @status(done,commit=d0982fe) @scenario(2026-05-27T15:00:00Z-docs-012)
+
 - [x] plan-022: add auto-claim workflow rules and loop guidance to PLAN.md
       @area(docs) @owner(context-docs-agent) @status(done,commit=fa15dc0) @scenario(2025-11-21T16:49:30Z-auto-claim)
