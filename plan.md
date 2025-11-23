@@ -260,7 +260,7 @@ The CLI already exposes stub variants for these commands; they currently just lo
 ## 6. Upcoming work – Web & Dev Web UI
 
 - [ ] web-010: scaffold React + TS + Vite + shadcn web UI in `web-ui/`
-      @area(web) @owner(unassigned) @status(unclaimed)
+      @area(web) @owner(context-web-agent) @status(in-progress) @scenario(2026-05-27T14:30:00Z-web-010)
 
 - [ ] web-011: serve compiled `web-ui` assets from `context-web` binary
       @area(web) @owner(unassigned) @status(unclaimed)

@@ -1,0 +1,70 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  --background: 222 47% 6%;
+  --foreground: 210 40% 98%;
+  --card: 226 34% 10%;
+  --card-foreground: 210 40% 98%;
+  --popover: 222 47% 8%;
+  --popover-foreground: 210 40% 98%;
+  --primary: 214 94% 56%;
+  --primary-foreground: 210 40% 98%;
+  --secondary: 242 33% 18%;
+  --secondary-foreground: 210 40% 98%;
+  --muted: 220 14% 20%;
+  --muted-foreground: 215 20% 78%;
+  --accent: 182 62% 60%;
+  --accent-foreground: 222 47% 6%;
+  --border: 220 14% 22%;
+  --input: 220 14% 22%;
+  --ring: 214 94% 56%;
+  --radius: 1rem;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+  font-family: 'Inter', 'Space Grotesk', system-ui, -apple-system, sans-serif;
+  background: radial-gradient(circle at 20% 20%, rgba(99, 102, 241, 0.15), transparent 40%),
+    radial-gradient(circle at 80% 0%, rgba(45, 212, 191, 0.12), transparent 30%),
+    hsl(var(--background));
+  color: hsl(var(--foreground));
+}
+
+::selection {
+  background: hsl(var(--accent));
+  color: hsl(var(--accent-foreground));
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+  body {
+    @apply bg-background text-foreground antialiased;
+  }
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: 'Space Grotesk', 'Inter', system-ui, sans-serif;
+  }
+}
+
+@layer components {
+  .glass-panel {
+    @apply bg-card/80 backdrop-blur-xl border border-white/5 shadow-lg shadow-black/40;
+  }
+
+  .pill {
+    @apply inline-flex items-center gap-2 rounded-full bg-white/5 px-3 py-1 text-xs uppercase tracking-wide text-muted-foreground;
+  }
+}
