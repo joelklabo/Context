@@ -47,6 +47,17 @@ enum Commands {
     /// Initialize context configuration (stub)
     Init,
 
+    /// Import agent-authored markdown files from a repository
+    Import {
+        /// Root directory to scan (defaults to current working directory)
+        #[arg(long)]
+        root: Option<PathBuf>,
+
+        /// Import all discovered files without prompting
+        #[arg(long)]
+        yes: bool,
+    },
+
     /// Store or update a document
     Put {
         /// Optional key for the document
@@ -217,6 +228,17 @@ fn run() -> Result<()> {
         Commands::Init => {
             println!("context init (stub): configuration will be set up here.");
         }
+        Commands::Import { root, yes } => {
+            tracing::info!(
+                scenario_id = log_context.scenario_id,
+                project = log_context.project,
+                command = log_context.command,
+                ?root,
+                yes,
+                "Import command invoked",
+            );
+            handle_import(resolved_project.clone(), json, root, yes)?;
+        }
         Commands::Put { key, file, tags } => {
             tracing::info!(
                 scenario_id = log_context.scenario_id,
@@ -369,6 +391,166 @@ fn run() -> Result<()> {
     }
 
     Ok(())
+}
+
+#[derive(Debug, Serialize)]
+struct ImportResult {
+    path: String,
+    document: Document,
+}
+
+fn handle_import(
+    project: Option<String>,
+    json_output: bool,
+    root: Option<PathBuf>,
+    yes: bool,
+) -> Result<()> {
+    let project = project.unwrap_or_else(|| "default".to_string());
+    let root_dir = root.unwrap_or(env::current_dir()?);
+    let candidates = discover_markdown_files(&root_dir)?;
+
+    if candidates.is_empty() {
+        if json_output {
+            println!(
+                "{}",
+                serde_json::to_string_pretty(&Vec::<ImportResult>::new())?
+            );
+        } else {
+            println!("No markdown files found under {}", root_dir.display());
+        }
+        return Ok(());
+    }
+
+    let selected_indices = if yes {
+        (0..candidates.len()).collect()
+    } else {
+        prompt_for_selection(&candidates)?
+    };
+
+    let mut results = Vec::new();
+    for index in selected_indices {
+        if let Some(path) = candidates.get(index) {
+            let body = fs::read_to_string(path)
+                .with_context(|| format!("Failed to read markdown file at {}", path.display()))?;
+            let now = Utc::now();
+            let relative = path.strip_prefix(&root_dir).unwrap_or(path);
+            let relative = relative.to_string_lossy().replace('\\', "/");
+            let document = Document {
+                id: DocumentId(Uuid::new_v4().to_string()),
+                project: project.clone(),
+                key: Some(format!("import/{relative}")),
+                namespace: None,
+                title: None,
+                tags: vec!["import".to_string(), "agent".to_string()],
+                body_markdown: body,
+                created_at: now,
+                updated_at: now,
+                source: SourceType::Import,
+                version: 1,
+                ttl_seconds: None,
+                deleted_at: None,
+            };
+
+            results.push(ImportResult {
+                path: relative,
+                document,
+            });
+        }
+    }
+
+    if json_output {
+        println!("{}", serde_json::to_string_pretty(&results)?);
+    } else {
+        println!(
+            "Imported {} markdown file(s) from {}",
+            results.len(),
+            root_dir.display()
+        );
+        for result in &results {
+            if let Some(key) = &result.document.key {
+                println!("- {} -> {key}", result.path);
+            } else {
+                println!("- {}", result.path);
+            }
+        }
+    }
+
+    Ok(())
+}
+
+fn prompt_for_selection(candidates: &[PathBuf]) -> Result<Vec<usize>> {
+    eprintln!("Select markdown files to import:");
+    for (idx, path) in candidates.iter().enumerate() {
+        eprintln!("{:>2}. {}", idx + 1, path.display());
+    }
+    eprint!("Enter numbers (comma-separated), 'all' for everything, or blank to skip: ");
+    io::stderr().flush()?;
+
+    let mut input = String::new();
+    io::stdin().read_line(&mut input)?;
+    let trimmed = input.trim();
+
+    if trimmed.is_empty() {
+        return Ok(Vec::new());
+    }
+    if trimmed.eq_ignore_ascii_case("all") {
+        return Ok((0..candidates.len()).collect());
+    }
+
+    let mut selections = Vec::new();
+    for part in trimmed.split([' ', ',']) {
+        let trimmed_part = part.trim();
+        if trimmed_part.is_empty() {
+            continue;
+        }
+        if let Ok(number) = trimmed_part.parse::<usize>() {
+            if number >= 1 && number <= candidates.len() {
+                selections.push(number - 1);
+            }
+        }
+    }
+
+    selections.sort();
+    selections.dedup();
+    Ok(selections)
+}
+
+fn discover_markdown_files(root: &Path) -> Result<Vec<PathBuf>> {
+    if !root.exists() {
+        bail!("Root directory does not exist: {}", root.display());
+    }
+
+    let mut files = Vec::new();
+    for entry in WalkDir::new(root)
+        .into_iter()
+        .filter_entry(|e| !is_hidden(e))
+    {
+        let entry = entry?;
+        if entry.file_type().is_file() {
+            if let Some(ext) = entry.path().extension().and_then(|s| s.to_str()) {
+                let ext = ext.to_ascii_lowercase();
+                if ext == "md" || ext == "markdown" {
+                    files.push(entry.path().to_path_buf());
+                }
+            }
+        }
+    }
+
+    files.sort();
+    files.dedup();
+    Ok(files)
+}
+
+fn is_hidden(entry: &walkdir::DirEntry) -> bool {
+    if entry.depth() == 0 {
+        return false;
+    }
+
+    entry
+        .file_name()
+        .to_str()
+        .map(|name| name.starts_with('.'))
+        .unwrap_or(false)
 }
 
 fn handle_put(
@@ -898,6 +1080,7 @@ fn command_name(command: &Commands) -> &'static str {
     match command {
         Commands::AgentDoc { .. } => "agent-doc",
         Commands::Init => "init",
+        Commands::Import { .. } => "import",
         Commands::Put { .. } => "put",
         Commands::Get { .. } => "get",
         Commands::Cat { .. } => "cat",
@@ -923,6 +1106,12 @@ fn command_span(log_context: LogContext<'_>, command: &Commands) -> Span {
         ),
         Commands::Init => tracing::info_span!(
             "cli.init",
+            scenario_id = log_context.scenario_id,
+            project = log_context.project,
+            command = log_context.command
+        ),
+        Commands::Import { .. } => tracing::info_span!(
+            "cli.import",
             scenario_id = log_context.scenario_id,
             project = log_context.project,
             command = log_context.command

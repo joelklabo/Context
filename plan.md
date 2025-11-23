@@ -255,6 +255,9 @@ The CLI already exposes stub variants for these commands; they currently just lo
 - [x] cli-021: implement `context project` subcommands (`current`, `set`, `list`) with tests
       @area(cli) @owner(context-cli-agent) @status(done,commit=05e2865) @scenario(2026-02-24T12:00:00Z-cli-021)
 
+- [x] cli-022: add `context import` TUI to select agent markdown files from a repo and ingest them
+      @area(cli) @owner(context-cli-agent) @status(done,commit=dd00995) @scenario(2026-05-30T12:00:00Z-cli-022)
+
 ---
 
 ## 6. Upcoming work – Web & Dev Web UI
